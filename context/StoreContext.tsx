@@ -7,7 +7,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { apiClient, setAuthToken } from "../utils/apiClient";
+import { apiClient, setAuthToken, getAuthToken } from "../utils/apiClient";
 import {
   CartItem,
   ItemVariant,
@@ -172,8 +172,13 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
           const storedRestId = localStorage.getItem(STORAGE_KEYS.REST_ID);
 
           if (storedUser) {
-            currentUser = JSON.parse(storedUser);
-            setUser(currentUser);
+            if (!getAuthToken()) {
+              // Clear legacy token-less session
+              localStorage.removeItem(STORAGE_KEYS.USER);
+            } else {
+              currentUser = JSON.parse(storedUser);
+              setUser(currentUser);
+            }
           }
           if (storedCart) setCart(JSON.parse(storedCart));
           if (storedOrders) setOrders(JSON.parse(storedOrders));
