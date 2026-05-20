@@ -15,30 +15,72 @@ interface ItemDetailModalProps {
   item: MenuItem | null;
   isOpen: boolean;
   onClose: () => void;
+  initialValues?: {
+    quantity?: number;
+    orderType?: OrderType;
+    instructions?: string;
+    selectedAllergies?: string[];
+    customAllergy?: string;
+    selectedVariant?: ItemVariant;
+    cartId?: string;
+  };
 }
 
-export function ItemDetailModal({ item, isOpen, onClose }: ItemDetailModalProps) {
-  const { addToCart } = useStore();
+export function ItemDetailModal({ item, isOpen, onClose, initialValues }: ItemDetailModalProps) {
+  const { cart, addToCart, updateQuantity: updateCartQuantity, updateCartItem, tableNumber } = useStore();
   const [quantity, setQuantity]               = useState(1);
   const [orderType, setOrderType]             = useState<OrderType>("Dining");
   const [instructions, setInstructions]       = useState("");
   const [selectedAllergies, setSelectedAllergies] = useState<string[]>([]);
   const [customAllergy, setCustomAllergy]     = useState("");
   const [showAllergies, setShowAllergies]     = useState(false);
+  const [existingCartId, setExistingCartId]   = useState<string | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<ItemVariant | null>(null);
+
+  const isTakeawayOnly = tableNumber === "Takeaway";
+
+  useEffect(() => {
+    if (isOpen && item) {
+      if (initialValues) {
+        setOrderType(initialValues.orderType || (isTakeawayOnly ? "Takeaway" : "Dining"));
+        setInstructions(initialValues.instructions || "");
+        setSelectedAllergies(initialValues.selectedAllergies || []);
+        setCustomAllergy(initialValues.customAllergy || "");
+        setQuantity(initialValues.quantity || 1);
+        setSelectedVariant(initialValues.selectedVariant || null);
+        setExistingCartId(initialValues.cartId || null);
+      } else {
+        setOrderType(isTakeawayOnly ? "Takeaway" : "Dining");
+        setInstructions("");
+        setSelectedAllergies([]);
+        setCustomAllergy("");
+        setQuantity(1);
+        setSelectedVariant(null);
+        setExistingCartId(null);
+      }
+    }
+  }, [isOpen, item, isTakeawayOnly, initialValues]);
+
+  // Track exact match if NOT in explicit edit mode
+  useEffect(() => {
+    if (!item || !isOpen || (initialValues && initialValues.cartId)) return;
+    
+    const targetId = `${item.id}-${selectedVariant?.id ?? ""}-${orderType}-${instructions.trim()}-${[...selectedAllergies].sort().join(",")}-${customAllergy.trim()}`;
+    const found = cart.find((i) => i.cartId === targetId);
+    if (found) {
+      setExistingCartId(found.cartId);
+      setQuantity(found.quantity);
+    } else {
+      setExistingCartId(null);
+      if (quantity === 0) setQuantity(1);
+    }
+  }, [item, isOpen, orderType, instructions, selectedAllergies, customAllergy, selectedVariant, cart, initialValues]);
 
   const variants    = item?.variants ?? [];
   const hasVariants = variants.length > 0;
 
   useEffect(() => {
     if (isOpen && item) {
-      setQuantity(1);
-      setOrderType("Dining");
-      setInstructions("");
-      setSelectedAllergies([]);
-      setCustomAllergy("");
-      setShowAllergies(false);
-      setSelectedVariant(variants.length > 0 ? variants[0] : null);
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
@@ -54,20 +96,36 @@ export function ItemDetailModal({ item, isOpen, onClose }: ItemDetailModalProps)
   const totalPrice     = (effectivePrice * quantity).toFixed(2);
 
   const handleAddToCart = () => {
-    if (hasVariants && !selectedVariant) {
-      alert("Please select a size or option.");
-      return;
+    try {
+      const params = {
+        item: { ...item, price: effectivePrice },
+        quantity,
+        orderType,
+        instructions: instructions.trim(),
+        allergies: selectedAllergies,
+        customAllergy: customAllergy.trim(),
+        selectedVariant: selectedVariant ?? undefined,
+      };
+
+      if (item.stockType === "limited") {
+        const available = parseInt(item.stockQuantity?.toString() || "0");
+        if (quantity > available) {
+          alert(`Only ${available} units available.`);
+          return;
+        }
+      }
+
+      if (initialValues?.cartId) {
+        updateCartItem(initialValues.cartId, params);
+      } else if (existingCartId) {
+        updateCartQuantity(existingCartId, quantity);
+      } else {
+        addToCart(params);
+      }
+      onClose();
+    } catch (error) {
+      alert(`Failed to update cart: ${error}`);
     }
-    addToCart({
-      item: { ...item, price: effectivePrice },
-      quantity,
-      orderType,
-      instructions,
-      allergies: selectedAllergies,
-      customAllergy,
-      selectedVariant,
-    });
-    onClose();
   };
 
   return (

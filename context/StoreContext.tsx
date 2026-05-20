@@ -34,6 +34,7 @@ interface StoreContextType {
   logout: () => void;
   cart: CartItem[];
   addToCart: (params: AddToCartParams) => void;
+  updateCartItem: (oldCartId: string, params: AddToCartParams) => void;
   removeFromCart: (cartId: string) => void;
   updateQuantity: (cartId: string, quantity: number) => void;
   clearCart: () => void;
@@ -338,6 +339,60 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
     });
   };
 
+  const updateCartItem = (oldCartId: string, params: AddToCartParams) => {
+    setCart((prev) => {
+      const filtered = prev.filter((i) => i.cartId !== oldCartId);
+      const {
+        item,
+        quantity,
+        orderType,
+        instructions,
+        allergies,
+        customAllergy,
+        selectedVariant,
+      } = params;
+
+      const cleanInstructions = (instructions || "").trim();
+      const cleanCustomAllergy = (customAllergy || "").trim();
+      const sortedAllergiesStr = [...(allergies || [])].sort().join(",");
+      const newCartId = `${item.id}-${selectedVariant?.id ?? ""}-${orderType}-${cleanInstructions}-${sortedAllergiesStr}-${cleanCustomAllergy}`;
+
+      const existing = filtered.find((i) => i.cartId === newCartId);
+      
+      // Stock validation
+      if (item.stockType === "limited") {
+        const currentQtyInCart = existing ? existing.quantity : 0;
+        const requestedTotal = currentQtyInCart + quantity;
+        
+        if (requestedTotal > (item.stockQuantity || 0)) {
+          alert(`Sorry, only ${item.stockQuantity} items available in stock.`);
+          return prev; // abort
+        }
+      }
+
+      if (existing) {
+        return filtered.map((i) =>
+          i.cartId === newCartId
+            ? { ...i, quantity: i.quantity + quantity }
+            : i,
+        );
+      }
+      return [
+        ...filtered,
+        {
+          ...item,
+          cartId: newCartId,
+          quantity,
+          orderType,
+          instructions: cleanInstructions,
+          allergies: allergies?.sort(),
+          customAllergy: cleanCustomAllergy,
+          selectedVariant: selectedVariant ?? undefined,
+        },
+      ];
+    });
+  };
+
   const removeFromCart = (cartId: string) =>
     setCart((prev) => prev.filter((i) => i.cartId !== cartId));
   const updateQuantity = (cartId: string, quantity: number) => {
@@ -513,6 +568,7 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
         logout,
         cart,
         addToCart,
+        updateCartItem,
         removeFromCart,
         updateQuantity,
         clearCart,

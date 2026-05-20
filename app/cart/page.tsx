@@ -13,9 +13,11 @@ import {
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { CartItemCard } from "../../components/menu/CartItemCard";
+import { ItemDetailModal } from "../../components/menu/ItemDetailModal";
 import { Header } from "../../components/ui/Header";
 import { useStore } from "../../context/StoreContext";
 import { apiClient } from "../../utils/apiClient";
+import { CartItem } from "../../utils/types";
 
 export default function CartPage() {
   const router = useRouter();
@@ -35,6 +37,7 @@ export default function CartPage() {
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [editingItem, setEditingItem] = useState<CartItem | null>(null);
   const [email, setEmail] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(true);
   const [error, setError] = useState("");
@@ -153,12 +156,20 @@ export default function CartPage() {
           {/* Cart Items */}
           <div className="space-y-3">
             {cart.map((item) => (
-              <CartItemCard
+              <div
                 key={item.cartId}
-                item={item}
-                onUpdate={(qty) => updateQuantity(item.cartId, qty)}
-                onRemove={() => removeFromCart(item.cartId)}
-              />
+                onClick={() => setEditingItem(item)}
+                className="cursor-pointer transition-transform active:scale-[0.98]"
+              >
+                <CartItemCard
+                  item={item}
+                  onUpdate={(qty) => {
+                    // Stop propagation inside onUpdate/onRemove not fully necessary as we handle it inside CartItemCard, but better safe.
+                    updateQuantity(item.cartId, qty);
+                  }}
+                  onRemove={() => removeFromCart(item.cartId)}
+                />
+              </div>
             ))}
           </div>
 
@@ -292,6 +303,26 @@ export default function CartPage() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Item Edit Modal */}
+      <ItemDetailModal
+        item={editingItem}
+        isOpen={!!editingItem}
+        onClose={() => setEditingItem(null)}
+        initialValues={
+          editingItem
+            ? {
+                quantity: editingItem.quantity,
+                orderType: editingItem.orderType,
+                instructions: editingItem.instructions,
+                selectedAllergies: editingItem.allergies,
+                customAllergy: editingItem.customAllergy,
+                selectedVariant: editingItem.selectedVariant,
+                cartId: editingItem.cartId,
+              }
+            : undefined
+        }
+      />
     </div>
   );
 }
