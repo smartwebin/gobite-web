@@ -7,7 +7,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { apiClient } from "../utils/apiClient";
+import { apiClient, setAuthToken } from "../utils/apiClient";
 import {
   CartItem,
   ItemVariant,
@@ -279,6 +279,7 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
     setRestaurantInfo(null);
     setMenuItems([]);
     setAvailableTables([]);
+    setAuthToken(null);
     if (typeof window !== "undefined") {
       localStorage.removeItem(STORAGE_KEYS.USER);
       localStorage.removeItem(STORAGE_KEYS.CART);

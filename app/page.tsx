@@ -5,7 +5,7 @@ import { Copy, Navigation, QrCode, Lock, Phone, User, Mail, ArrowRight } from "l
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState, useEffect, Suspense } from "react";
 import { useStore } from "../context/StoreContext";
-import { apiClient } from "../utils/apiClient";
+import { apiClient, setAuthToken } from "../utils/apiClient";
 
 type AuthView = "welcome" | "login" | "signup" | "signup_otp_verify";
 
@@ -136,6 +136,9 @@ function GetStartedContent() {
       });
 
       if (resp.status === "success") {
+        if (resp.data?.token) {
+          setAuthToken(resp.data.token);
+        }
         login({
           id: resp.data.user.id.toString(),
           name: resp.data.user.name,

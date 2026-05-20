@@ -2,18 +2,46 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost/Zen/gobite/
 const AUTH_USER = 'admin';
 const AUTH_PASS = 'secret123';
 
+let _authToken: string | null = null;
+
+export const setAuthToken = (token: string | null) => {
+  _authToken = token;
+  if (typeof window !== 'undefined') {
+    if (token) {
+      localStorage.setItem('gobite_jwt_token', token);
+    } else {
+      localStorage.removeItem('gobite_jwt_token');
+    }
+  }
+};
+
+export const getAuthToken = () => {
+  if (typeof window !== 'undefined' && !_authToken) {
+    _authToken = localStorage.getItem('gobite_jwt_token');
+  }
+  return _authToken;
+};
+
 /**
- * Centrialized API client for GoBite
+ * Centralized API client for GoBite
  */
 export const apiClient = {
   async request(endpoint: string, options: RequestInit = {}) {
     const url = `${API_URL}/${endpoint.startsWith('/') ? endpoint.slice(1) : endpoint}`;
 
-    // Setup Basic Auth header
-    const auth = btoa(`${AUTH_USER}:${AUTH_PASS}`);
+    const token = getAuthToken();
+    let authHeader = '';
+
+    if (token) {
+      authHeader = `Bearer ${token}`;
+    } else {
+      // Fallback to Basic Auth
+      const auth = btoa(`${AUTH_USER}:${AUTH_PASS}`);
+      authHeader = `Basic ${auth}`;
+    }
 
     const headers = {
-      'Authorization': `Basic ${auth}`,
+      'Authorization': authHeader,
       'Content-Type': 'application/json',
       ...options.headers,
     };
