@@ -24,6 +24,7 @@ function GetStartedContent() {
   const router = useRouter();
   const { login, setSessionInfo, user, refreshData } = useStore();
   const [view, setView] = useState<AuthView>(token ? "welcome" : "login");
+  const [isValidToken, setIsValidToken] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -48,6 +49,7 @@ function GetStartedContent() {
   const handleVerifyToken = async (t: string) => {
     setLoading(true);
     setError("");
+    setIsValidToken(false);
     try {
       const resp = await apiClient.post("verify-qr.php", {
         qr_token: t,
@@ -64,6 +66,7 @@ function GetStartedContent() {
         
         // Fetch fresh restaurant data based on verified token
         await refreshData(d.restaurant_id.toString());
+        setIsValidToken(true);
         
         // If already logged in, go to menu. Otherwise stay to login/signup
         if (user) {
@@ -72,10 +75,16 @@ function GetStartedContent() {
           setError("success:Table identified! Please login or continue as guest.");
         }
       } else {
-        setError("Invalid or expired QR token.");
+        setSessionInfo("default", "", "0");
+        setError("warning:The restaurant is not serving right now, but you can still login to your account.");
+        setIsValidToken(false);
+        setView("login");
       }
     } catch (err) {
-      setError("Failed to verify QR code.");
+      setSessionInfo("default", "", "0");
+      setError("warning:The restaurant is not serving right now, but you can still login to your account.");
+      setIsValidToken(false);
+      setView("login");
     } finally {
       setLoading(false);
     }
@@ -268,8 +277,14 @@ function GetStartedContent() {
           </div>
 
           {error && (
-            <div className={`${error.startsWith("success:") ? "bg-green-50 text-green-600 border-green-100" : "bg-red-50 text-red-600 border-red-100"} text-sm px-4 py-3 rounded-xl border flex items-center gap-2`}>
-              <span>{error.replace("success:", "")}</span>
+            <div className={`${
+              error.startsWith("success:") 
+                ? "bg-green-50 text-green-600 border-green-100" 
+                : error.startsWith("warning:")
+                ? "bg-amber-50 text-amber-700 border-amber-200"
+                : "bg-red-50 text-red-600 border-red-100"
+            } text-sm px-4 py-3 rounded-xl border flex items-center gap-2`}>
+              <span>{error.replace("success:", "").replace("warning:", "")}</span>
             </div>
           )}
 
@@ -496,7 +511,7 @@ function GetStartedContent() {
                   </button>
                 </p>
               )}
-              {token && (
+              {isValidToken && (
                 <button
                     onClick={() => {
                       setError("");

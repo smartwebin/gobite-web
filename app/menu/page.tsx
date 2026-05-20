@@ -14,6 +14,7 @@ import { MenuItem } from "../../utils/types";
 export default function MenuPage() {
   const { tableNumber, setSessionInfo, menuItems, restaurantInfo, restaurantId, user, availableTables } = useStore();
   const [activeCategory, setActiveCategory] = useState("All");
+  const [activeType, setActiveType] = useState<"all" | "veg" | "non-veg">("all");
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [showTablePicker, setShowTablePicker] = useState(false);
 
@@ -40,10 +41,11 @@ export default function MenuPage() {
     }
   }, [tableNumber, restaurantId, user, availableTables, setSessionInfo]);
 
-  const filteredItems =
-    activeCategory === "All"
-      ? menuItems
-      : menuItems.filter((i) => i.category === activeCategory);
+  const filteredItems = menuItems.filter((item) => {
+    const matchesCategory = activeCategory === "All" || item.category === activeCategory;
+    const matchesType = activeType === "all" || item.itemType === activeType;
+    return matchesCategory && matchesType;
+  });
 
   const getSubtitle = () => {
     if (tableNumber === "Takeaway") return `Takeaway`;
@@ -55,8 +57,8 @@ export default function MenuPage() {
       <Header showCart />
 
       <button 
-        onClick={() => setShowTablePicker(true)}
-        className="w-full bg-white border-b border-borderLite px-4 py-3.5 flex items-center gap-2 hover:bg-gray-50 transition-colors"
+      onClick={() => setShowTablePicker(true)}
+      className="w-full bg-white border-b border-borderLite px-4 py-3.5 flex items-center gap-2 hover:bg-gray-50 transition-colors"
       >
         <MapPin size={18} className="text-primary flex-shrink-0" />
         <span className="text-sm font-bold text-ink flex-1 text-left">
@@ -71,6 +73,48 @@ export default function MenuPage() {
         onSelect={setActiveCategory}
       />
 
+      {/* Veg / Non-Veg Type Filters */}
+      <div className="bg-bgBase py-3 px-4 md:px-8 border-b border-borderLite/50 flex gap-2 overflow-x-auto scrollbar-none">
+        {[
+          { label: "All", value: "all" },
+          { label: "Veg", value: "veg" },
+          { label: "Non-Veg", value: "non-veg" },
+        ].map((t) => {
+          const active = activeType === t.value;
+          let activeColorClass = "border-primary bg-accentLight text-primary";
+          let vegOrNonVegIndicator = null;
+          
+          if (t.value === "veg") {
+            activeColorClass = "border-green-500 bg-green-50 text-green-600";
+            vegOrNonVegIndicator = (
+              <div className="w-2.5 h-2.5 border border-green-500 flex items-center justify-center rounded-[1px] mr-1.5 shrink-0">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              </div>
+            );
+          } else if (t.value === "non-veg") {
+            activeColorClass = "border-red-500 bg-red-50 text-red-600";
+            vegOrNonVegIndicator = (
+              <div className="w-2.5 h-2.5 border border-red-500 flex items-center justify-center rounded-[1px] mr-1.5 shrink-0">
+                <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+              </div>
+            );
+          }
+
+          return (
+            <button
+              key={t.value}
+              onClick={() => setActiveType(t.value as any)}
+              className={`flex items-center px-4 py-1.5 rounded-full bg-white border border-borderLite text-xs font-semibold text-inkMid hover:bg-gray-50 transition-all ${
+                active ? activeColorClass : ""
+              }`}
+            >
+              {vegOrNonVegIndicator}
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
+
       <div className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full relative z-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
           {filteredItems.length > 0 ? (
@@ -82,7 +126,6 @@ export default function MenuPage() {
               />
             ))
           ) : (
-
             <div className="col-span-full flex flex-col items-center justify-center py-20 opacity-60">
               <UtensilsCrossed size={40} className="text-inkLight mb-4" />
               <p className="text-sm font-medium text-inkLight">

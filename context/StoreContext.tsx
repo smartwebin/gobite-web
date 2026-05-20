@@ -274,12 +274,17 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
     setCart([]);
     setOrders([]);
     setTableNumber("");
+    setTableId("0");
+    setRestaurantId("default");
+    setRestaurantInfo(null);
+    setMenuItems([]);
+    setAvailableTables([]);
     if (typeof window !== "undefined") {
       localStorage.removeItem(STORAGE_KEYS.USER);
       localStorage.removeItem(STORAGE_KEYS.CART);
       localStorage.removeItem(STORAGE_KEYS.ORDERS);
       localStorage.removeItem(STORAGE_KEYS.TABLE);
-      // We keep REST_ID to stay in the same restaurant context after logout
+      localStorage.removeItem(STORAGE_KEYS.REST_ID);
     }
   };
 
@@ -478,9 +483,21 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
     setRestaurantId(restId);
     setTableNumber(table);
     if (tid) setTableId(tid);
+    
+    if (restId === "default") {
+      setRestaurantInfo(null);
+      setMenuItems([]);
+      setAvailableTables([]);
+    }
+    
     if (typeof window !== "undefined") {
-      localStorage.setItem(STORAGE_KEYS.REST_ID, restId);
-      localStorage.setItem(STORAGE_KEYS.TABLE, table);
+      if (restId === "default") {
+        localStorage.removeItem(STORAGE_KEYS.REST_ID);
+        localStorage.removeItem(STORAGE_KEYS.TABLE);
+      } else {
+        localStorage.setItem(STORAGE_KEYS.REST_ID, restId);
+        localStorage.setItem(STORAGE_KEYS.TABLE, table);
+      }
     }
     if (isNewRestaurant && restId !== "default") {
       refreshData(restId);

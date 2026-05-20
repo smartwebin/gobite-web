@@ -44,6 +44,7 @@ export default function DashboardPage() {
       color: "text-orange-500",
       bg: "bg-orange-50",
       route: "/menu",
+      hide: restaurantId === "default" || !restaurantInfo,
     },
     {
       id: "scan",
@@ -108,32 +109,34 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Restaurant Status Card */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-primary rounded-3xl p-6 shadow-[0_10px_30px_rgba(255,107,53,0.2)] text-white relative overflow-hidden"
-        >
-          <div className="relative z-10 flex items-center justify-between">
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5 opacity-90">
-                <MapPin size={14} />
-                <span className="text-xs font-bold uppercase tracking-wider">Current Location</span>
+        {restaurantId !== "default" && restaurantInfo && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-primary rounded-3xl p-6 shadow-[0_10px_30px_rgba(255,107,53,0.2)] text-white relative overflow-hidden"
+          >
+            <div className="relative z-10 flex items-center justify-between">
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5 opacity-90">
+                  <MapPin size={14} />
+                  <span className="text-xs font-bold uppercase tracking-wider">Current Location</span>
+                </div>
+                <h3 className="text-2xl font-black tracking-tight">
+                  {restaurantInfo.name}
+                </h3>
+                <p className="text-white/80 font-medium">
+                  {tableNumber === "Takeaway" ? "Takeaway Order" : `Table ${tableNumber || "Not Selected"}`}
+                </p>
               </div>
-              <h3 className="text-2xl font-black tracking-tight">
-                {restaurantInfo?.name || "GoBite Restaurant"}
-              </h3>
-              <p className="text-white/80 font-medium">
-                {tableNumber === "Takeaway" ? "Takeaway Order" : `Table ${tableNumber || "Not Selected"}`}
-              </p>
+              <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
+                <ShoppingBag size={24} />
+              </div>
             </div>
-            <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-md">
-              <ShoppingBag size={24} />
-            </div>
-          </div>
-          {/* Decorative element */}
-          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
-        </motion.div>
+            {/* Decorative element */}
+            <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+          </motion.div>
+        )}
 
         {/* Navigation Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

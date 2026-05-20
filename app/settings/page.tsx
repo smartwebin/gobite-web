@@ -20,6 +20,7 @@ export default function SettingsPage() {
   const [form, setForm] = useState({
     name: user?.name || "",
     phone: user?.phone || "",
+    email: user?.email || "",
     currentPassword: "",
     newPassword: "",
   });
@@ -28,7 +29,12 @@ export default function SettingsPage() {
     if (!user || user.is_guest) {
       router.replace("/menu");
     } else {
-      setForm((prev) => ({ ...prev, name: user.name, phone: user.phone }));
+      setForm((prev) => ({ 
+        ...prev, 
+        name: user.name, 
+        phone: user.phone || "", 
+        email: user.email || "" 
+      }));
     }
   }, [user, router]);
 
@@ -45,10 +51,11 @@ export default function SettingsPage() {
         user_id: user.id,
         name: form.name,
         phone: form.phone,
+        email: form.email,
       });
       if (resp.status === "success") {
         setMessage("Profile updated successfully!");
-        login({ ...user, name: form.name, phone: form.phone });
+        login({ ...user, name: form.name, phone: form.phone, email: form.email });
       } else {
         setError(resp.message || "Update failed.");
       }
@@ -194,12 +201,13 @@ export default function SettingsPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-inkMid uppercase tracking-wider">Email (Read Only)</label>
+                  <label className="text-xs font-bold text-inkMid uppercase tracking-wider">Email</label>
                   <input
                     type="email"
-                    value={user.email}
-                    disabled
-                    className="w-full border-2 border-borderLite bg-gray-50 rounded-xl px-4 py-3 text-inkMid focus:outline-none"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    className="w-full border-2 border-borderLite rounded-xl px-4 py-3 text-ink focus:border-primary focus:outline-none"
+                    required
                   />
                 </div>
                 <button
