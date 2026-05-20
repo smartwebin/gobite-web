@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Header } from "../../components/ui/Header";
 import { StatusBadge } from "../../components/ui/StatusBadge";
 import { useStore } from "../../context/StoreContext";
@@ -24,10 +24,14 @@ import { Order } from "../../utils/types";
 
 export default function OrdersPage() {
   const router = useRouter();
-  const { orders, setActiveOrder, removeOrderItem } = useStore();
+  const { orders, setActiveOrder, removeOrderItem, fetchOrders } = useStore();
   const [expandedOrder, setExpandedOrder] = useState<string | null>(
     orders[0]?.id || null,
   );
+
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   const handleAddItems = (orderId: string) => {
     setActiveOrder(orderId);

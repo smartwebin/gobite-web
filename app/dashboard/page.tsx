@@ -46,15 +46,7 @@ export default function DashboardPage() {
       route: "/menu",
       hide: restaurantId === "default" || !restaurantInfo,
     },
-    {
-      id: "scan",
-      title: "Scan QR",
-      sub: "Change table or restaurant",
-      icon: <QrCode size={24} />,
-      color: "text-gray-600",
-      bg: "bg-gray-100",
-      route: "/",
-    },
+
     {
       id: "orders",
       title: "My Orders",
