@@ -27,7 +27,11 @@ export default function AboutPage() {
 
   const getDomainRoot = () => {
     const apiURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost/Zen/gobite/api";
-    return apiURL.replace("/api", "/");
+    try {
+      return new URL(apiURL).origin;
+    } catch {
+      return "";
+    }
   };
 
   const domain = getDomainRoot();
