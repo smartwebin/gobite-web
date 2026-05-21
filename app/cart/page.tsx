@@ -51,6 +51,7 @@ export default function CartPage() {
   const grandTotal = subtotal + serviceFee;
 
   const handleInitialCheckout = () => {
+    if (user?.email) setEmail(user.email);
     setShowEmailModal(true);
   };
 
@@ -68,6 +69,7 @@ export default function CartPage() {
         user_id: user?.id ? parseInt(user.id) : null,
         table_id: tableId && tableId !== "0" ? parseInt(tableId) : null,
         order_type: tableNumber === "Takeaway" ? "takeaway" : "dine-in",
+        customer_email: email.trim() || undefined,
         items: cart.map(item => ({
           id: parseInt(item.id),
           quantity: item.quantity,
@@ -264,11 +266,30 @@ export default function CartPage() {
               </div>
 
               <h2 className="text-2xl font-extrabold text-ink mb-2">
-                Order Details
+                Almost there!
               </h2>
-              <p className="text-sm text-inkMid mb-8 leading-relaxed">
-                Confirming your order for table <strong>{tableNumber}</strong>.
+              <p className="text-sm text-inkMid mb-5 leading-relaxed">
+                Confirming your order for{" "}
+                <strong>{tableNumber === "Takeaway" ? "Takeaway" : `Table ${tableNumber}`}</strong>.
               </p>
+
+              {/* Email input */}
+              <div className="mb-5">
+                <label className="block text-xs font-bold text-inkMid mb-1.5 uppercase tracking-wider">
+                  Receipt Email <span className="text-inkLight font-normal normal-case">(optional)</span>
+                </label>
+                <div className="flex items-center gap-3 bg-[#F9F9F7] border border-borderLite rounded-2xl px-4 py-3 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/10 transition-all">
+                  <Mail size={16} className="text-inkLight shrink-0" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="flex-1 bg-transparent text-sm text-ink placeholder-inkLight outline-none"
+                  />
+                </div>
+                <p className="text-[11px] text-inkLight mt-1.5 pl-1">We&apos;ll send a copy of your order to this address.</p>
+              </div>
 
               {error && (
                 <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-xl border border-red-100 mb-4">

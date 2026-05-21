@@ -15,11 +15,13 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { Header } from "../../components/ui/Header";
+import { QrScannerModal } from "../../components/ui/QrScannerModal";
 import { useStore } from "../../context/StoreContext";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, logout, restaurantInfo, tableNumber, restaurantId, isLoading } = useStore();
+  const [isScanning, setIsScanning] = React.useState(false);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -35,7 +37,17 @@ export default function DashboardPage() {
     );
   }
 
-  const NAV_ITEMS = [
+  const NAV_ITEMS: { id: string; title: string; sub: string; icon: JSX.Element; color: string; bg: string; route: string | null; action?: () => void; hide?: boolean }[] = [
+    {
+      id: "scan",
+      title: "Scan QR Code",
+      sub: "Scan a table QR to start ordering",
+      icon: <QrCode size={24} />,
+      color: "text-primary",
+      bg: "bg-accentLight",
+      route: null,
+      action: () => setIsScanning(true),
+    },
     {
       id: "menu",
       title: "View Menu",
@@ -138,7 +150,7 @@ export default function DashboardPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 + index * 0.05 }}
-              onClick={() => router.push(item.route)}
+              onClick={() => item.action ? item.action() : item.route && router.push(item.route)}
               className="bg-white p-5 rounded-2xl border border-borderLite shadow-sm hover:shadow-md transition-all flex items-center gap-4 text-left group active:scale-[0.98]"
             >
               <div className={`w-14 h-14 ${item.bg} ${item.color} rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm`}>
@@ -173,6 +185,8 @@ export default function DashboardPage() {
           </motion.button>
         </div>
       </main>
+
+      <QrScannerModal isOpen={isScanning} onClose={() => setIsScanning(false)} />
     </div>
   );
 }

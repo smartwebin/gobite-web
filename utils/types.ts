@@ -74,6 +74,7 @@ export interface Order {
   tableNumber: string;
   customerName?: string;
   customerPhone?: string;
+  orderType?: OrderType;
 }
 
 export interface Restaurant {
