@@ -37,7 +37,7 @@ export default function DashboardPage() {
     );
   }
 
-  const NAV_ITEMS: { id: string; title: string; sub: string; icon: JSX.Element; color: string; bg: string; route: string | null; action?: () => void; hide?: boolean }[] = [
+  const NAV_ITEMS: { id: string; title: string; sub: string; icon: React.ReactNode; color: string; bg: string; route: string | null; action?: () => void; hide?: boolean }[] = [
     {
       id: "scan",
       title: "Scan QR Code",
