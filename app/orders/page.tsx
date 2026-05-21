@@ -180,6 +180,11 @@ export default function OrdersPage() {
                               >
                                 {item.name}
                               </p>
+                              {item.selectedVariant && (
+                                <span className="text-[11px] text-inkMid bg-gray-100 px-2 py-0.5 rounded-full inline-block mt-0.5">
+                                  {item.selectedVariant.variantName}
+                                </span>
+                              )}
 
                               {isRemoved && (
                                 <div className="flex items-center gap-2 mt-1">

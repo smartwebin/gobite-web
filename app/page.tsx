@@ -70,7 +70,7 @@ function GetStartedContent() {
         
         // If already logged in, go to menu. Otherwise stay to login/signup
         if (user) {
-          router.push("/menu");
+          router.push("/menu?from_scan=1");
         } else {
           setError("success:Table identified! Please login or continue as guest.");
         }
@@ -108,7 +108,7 @@ function GetStartedContent() {
           role: "customer",
           is_guest: true,
         });
-        const dest = token ? "/menu" : "/dashboard";
+        const dest = token ? "/menu?from_scan=1" : "/dashboard";
         router.push(dest);
       } else {
         setError(resp.message || "Guest login failed.");
@@ -146,7 +146,7 @@ function GetStartedContent() {
           phone: resp.data.user.phone,
           role: "customer",
         });
-        const dest = token ? "/menu" : "/dashboard";
+        const dest = token ? "/menu?from_scan=1" : "/dashboard";
         router.push(dest);
       } else {
         setError(resp.message || "Invalid credentials.");

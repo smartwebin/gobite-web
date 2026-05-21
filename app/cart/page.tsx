@@ -51,7 +51,8 @@ export default function CartPage() {
   const grandTotal = subtotal + serviceFee;
 
   const handleInitialCheckout = () => {
-    if (user?.email) setEmail(user.email);
+    if (user?.email && !user?.is_guest) setEmail(user.email);
+    else setEmail(""); // clear for guests / new modal open
     setShowEmailModal(true);
   };
 

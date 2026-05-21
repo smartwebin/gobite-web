@@ -4,7 +4,7 @@ import { OrderStatus } from "../../utils/types";
 export function StatusBadge({ status }: { status: OrderStatus }) {
   const map: Record<OrderStatus, { bg: string; text: string; label: string }> =
   {
-    pending: { bg: "bg-blue-50", text: "text-blue-600", label: "Waiting" },
+    pending: { bg: "bg-amber-50", text: "text-amber-600", label: "Pending" },
     received: { bg: "bg-blue-100", text: "text-blue-700", label: "Received" },
     preparing: {
       bg: "bg-orange-50",

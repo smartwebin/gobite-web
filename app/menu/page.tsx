@@ -1,7 +1,8 @@
 "use client";
 
 import { ShieldCheck, UtensilsCrossed, MapPin, ChevronDown } from "lucide-react";
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { CartFloatingButton } from "../../components/menu/CartFloatingButton";
 import { CategoryTabs } from "../../components/menu/CategoryTabs";
 import { ItemDetailModal } from "../../components/menu/ItemDetailModal";
@@ -12,6 +13,16 @@ import { useStore } from "../../context/StoreContext";
 import { MenuItem } from "../../utils/types";
 
 export default function MenuPage() {
+  return (
+    <Suspense fallback={<div className="flex-1 flex items-center justify-center min-h-screen bg-[#F7F5F2]"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" /></div>}>
+      <MenuContent />
+    </Suspense>
+  );
+}
+
+function MenuContent() {
+  const searchParams = useSearchParams();
+  const fromScan = searchParams.get("from_scan") === "1";
   const { tableNumber, setSessionInfo, menuItems, restaurantInfo, restaurantId, user, availableTables } = useStore();
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeType, setActiveType] = useState<"all" | "veg" | "non-veg">("all");
@@ -26,7 +37,16 @@ export default function MenuPage() {
 
   const hotelName = restaurantInfo?.name || "GoBite";
 
+  // If arrived via QR scan, ALWAYS force the table picker open
   useEffect(() => {
+    if (fromScan) {
+      setShowTablePicker(true);
+    }
+  }, [fromScan]);
+
+  useEffect(() => {
+    // Skip if fromScan already triggered the picker
+    if (fromScan) return;
     if (restaurantId && restaurantId !== "default" && !tableNumber && (!user || user.role === "customer")) {
       const myEngagedTable = availableTables.find((t: any) => t.engaged_by_user_id?.toString() === user?.id?.toString());
       if (myEngagedTable) {
@@ -39,7 +59,7 @@ export default function MenuPage() {
       // Fallback if no restaurantId yet
       setShowTablePicker(true);
     }
-  }, [tableNumber, restaurantId, user, availableTables, setSessionInfo]);
+  }, [tableNumber, restaurantId, user, availableTables, setSessionInfo, fromScan]);
 
   const filteredItems = menuItems.filter((item) => {
     const matchesCategory = activeCategory === "All" || item.category === activeCategory;
