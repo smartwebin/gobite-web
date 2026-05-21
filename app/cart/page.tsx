@@ -33,6 +33,7 @@ export default function CartPage() {
     tableNumber,
     user,
     restaurantInfo,
+    fetchOrders,
   } = useStore();
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -80,6 +81,7 @@ export default function CartPage() {
       const resp = await apiClient.post("place-order.php", orderData);
 
       if (resp.status === "success") {
+        await fetchOrders();
         clearCart();
         setIsProcessing(false);
         setShowEmailModal(false);

@@ -537,21 +537,41 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
       }),
     );
   };
-  const removeOrderItem = (orderId: string, itemCartId: string) => {
-    setOrders((prev) =>
-      prev.map((order) => {
-        if (order.id !== orderId) return order;
-        const updatedItems = order.items.filter((i) => i.cartId !== itemCartId);
-        const newTotal = updatedItems.reduce(
-          (sum, item) =>
-            item.status === "removed" || item.status === "unavailable"
-              ? sum
-              : sum + item.price * item.quantity,
-          0,
+  const removeOrderItem = async (orderId: string, itemCartId: string) => {
+    try {
+      const res = await apiClient.post("update-order.php", {
+        action: "update_item_status",
+        order_id: parseInt(orderId),
+        item_id: parseInt(itemCartId),
+        status: "removed",
+        staff_note: "",
+        staff_id: user?.id ? parseInt(user.id) : 0,
+      });
+
+      if (res.status === "success") {
+        setOrders((prev) =>
+          prev.map((order) => {
+            if (order.id !== orderId) return order;
+            const updatedItems = order.items.map((i) =>
+              i.cartId === itemCartId ? { ...i, status: "removed" as any } : i,
+            );
+            const activeItems = updatedItems.filter(i => i.status !== "removed");
+            const newSubtotal = activeItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+            const newServiceFee = newSubtotal * 0.1;
+            return {
+              ...order,
+              items: updatedItems,
+              total: newSubtotal,
+              serviceFee: newServiceFee,
+              grandTotal: newSubtotal + newServiceFee,
+              status: activeItems.length === 0 ? "cancelled" : order.status,
+            };
+          }),
         );
-        return { ...order, items: updatedItems, total: newTotal };
-      }),
-    );
+      }
+    } catch (e) {
+      console.error("Failed to remove item:", e);
+    }
   };
 
   const updateMenuItemAvailability = (itemId: string, available: boolean) => {
