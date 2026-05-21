@@ -168,6 +168,10 @@ function GetStartedContent() {
       setError("Please provide either an email or a phone number.");
       return;
     }
+    if (form.phone.trim() && !/^\d{11}$/.test(form.phone.trim())) {
+      setError("Please enter a valid 11-digit UK phone number (e.g. 07123456789).");
+      return;
+    }
     if (form.password !== form.confirmPassword) {
       setError("Passwords do not match.");
       return;
@@ -355,7 +359,7 @@ function GetStartedContent() {
                     name="identifier"
                     value={form.identifier}
                     onChange={handleChange}
-                    placeholder="john@example.com or (555)"
+                    placeholder="john@example.com or 07123456789"
                     className="w-full bg-white border-2 border-borderLite rounded-2xl pl-11 pr-4 py-3 text-base text-ink focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -418,7 +422,7 @@ function GetStartedContent() {
                     name="phone"
                     value={form.phone}
                     onChange={handleChange}
-                    placeholder="(555)"
+                    placeholder="07123456789"
                     className="w-full bg-white border-2 border-borderLite rounded-2xl pl-9 pr-3 py-2.5 text-sm text-ink focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -434,7 +438,7 @@ function GetStartedContent() {
                     name="email"
                     value={form.email}
                     onChange={handleChange}
-                    placeholder="john@..."
+                    placeholder="john@example.com"
                     className="w-full bg-white border-2 border-borderLite rounded-2xl pl-9 pr-3 py-2.5 text-sm text-ink focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>

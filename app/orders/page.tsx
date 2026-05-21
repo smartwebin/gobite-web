@@ -24,7 +24,7 @@ import { Order } from "../../utils/types";
 
 export default function OrdersPage() {
   const router = useRouter();
-  const { orders, setActiveOrder, removeOrderItem, fetchOrders } = useStore();
+  const { orders, setActiveOrder, removeOrderItem, fetchOrders, updateOrderStatus } = useStore();
   const [expandedOrder, setExpandedOrder] = useState<string | null>(
     orders[0]?.id || null,
   );
@@ -242,24 +242,38 @@ export default function OrdersPage() {
                     <div className="flex justify-between items-center text-[13px] text-inkMid">
                       <span>Subtotal</span>
                       <span className="font-semibold">
-                        £{order.total.toFixed(2)}
+                        £{Number(order.total || 0).toFixed(2)}
                       </span>
                     </div>
-                    <div className="flex justify-between items-center text-[13px] text-inkMid">
-                      <span>Service Fee (10%)</span>
-                      <span className="font-semibold">
-                        £{(order.serviceFee || 0).toFixed(2)}
-                      </span>
-                    </div>
+                    {!!order.serviceFee && (
+                      <div className="flex justify-between items-center text-[13px] text-inkMid">
+                        <span>Service Fee</span>
+                        <span className="font-semibold">
+                          £{Number(order.serviceFee || 0).toFixed(2)}
+                        </span>
+                      </div>
+                    )}
                     <div className="h-px bg-borderLite my-1" />
                     <div className="flex justify-between items-center">
                       <span className="font-extrabold text-[15px] text-ink">
                         Grand Total
                       </span>
                       <span className="font-extrabold text-lg text-primary">
-                        £{(order.grandTotal || order.total).toFixed(2)}
+                        £{Number(order.grandTotal || order.total).toFixed(2)}
                       </span>
                     </div>
+                    
+                    {order.status === "pending" && (
+                      <div className="pt-3 border-t border-borderLite mt-2">
+                        <button
+                          onClick={() => updateOrderStatus(order.id, "cancelled")}
+                          className="w-full flex items-center justify-center gap-2 py-3 bg-red-50 text-red-500 font-bold rounded-xl hover:bg-red-100 transition-colors"
+                        >
+                          <Trash2 size={16} />
+                          Cancel Order
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}

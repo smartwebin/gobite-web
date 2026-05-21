@@ -65,7 +65,7 @@ interface StoreContextType {
   availableTables: { id: string; table_number: string; status?: string; engaged_by_user_id?: string }[];
   isLoading: boolean;
   restaurantInfo: any;
-  fetchOrders: () => Promise<void>;
+  fetchOrders: (userIdOverride?: string) => Promise<void>;
   refreshData: (rid: string) => Promise<void>;
 }
 
@@ -94,10 +94,11 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
   const [availableTables, setAvailableTables] = useState<{ id: string; table_number: string; status?: string; engaged_by_user_id?: string }[]>([]);
   const [activeOrderId, setActiveOrder] = useState<string | null>(null);
 
-  const fetchOrders = async () => {
-    if (!user?.id) return;
+  const fetchOrders = async (userIdOverride?: string) => {
+    const uid = userIdOverride || user?.id;
+    if (!uid) return;
     try {
-      const resp = await apiClient.get(`get-orders.php?user_id=${user.id}`);
+      const resp = await apiClient.get(`get-orders.php?user_id=${uid}`);
       if (resp.status === "success") {
         setOrders(resp.data);
       }
@@ -273,7 +274,7 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
         localStorage.setItem(STORAGE_KEYS.REST_ID, newUser.restaurant_id.toString());
       }
     }
-    fetchOrders();
+    fetchOrders(newUser.id);
   };
   const logout = () => {
     setUser(null);
@@ -431,10 +432,30 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
       }),
     );
   };
-  const updateOrderStatus = (orderId: string, status: OrderStatus) => {
-    setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status } : o)),
-    );
+  const updateOrderStatus = async (orderId: string, status: OrderStatus) => {
+    try {
+      const res = await apiClient.post("update-order.php", {
+        action: "update_order_status",
+        order_id: parseInt(orderId),
+        status,
+        staff_id: user?.id ? parseInt(user.id) : 0,
+      });
+      if (res.status === "success") {
+        setOrders((prev) =>
+          prev.map((o) => {
+            if (o.id === orderId) {
+              if (status === "cancelled") {
+                return { ...o, status, total: 0, serviceFee: 0, grandTotal: 0 };
+              }
+              return { ...o, status };
+            }
+            return o;
+          }),
+        );
+      }
+    } catch (e) {
+      console.error("Failed to update status:", e);
+    }
   };
   const updateOrderItemQuantity = (
     orderId: string,
