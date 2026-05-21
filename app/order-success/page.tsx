@@ -67,7 +67,7 @@ export default function OrderSuccessPage() {
           <div className="flex justify-between items-center text-base">
             <span className="text-inkMid font-medium">Amount Charged</span>
             <span className="font-black text-xl text-primary">
-              £{latestOrder?.total.toFixed(2) || "0.00"}
+              £{latestOrder?.grandTotal?.toFixed(2) || latestOrder?.total?.toFixed(2) || "0.00"}
             </span>
           </div>
         </div>

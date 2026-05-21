@@ -198,9 +198,9 @@ export default function OrdersPage() {
 
                               <div className="flex flex-wrap gap-2 items-center mt-1.5">
                                 <span
-                                  className={`text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${item.orderType === "Takeaway" ? "bg-blue-50 text-blue-500" : "bg-accentLight text-primary"} ${isRemoved ? "opacity-50" : ""}`}
+                                  className={`text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${order.orderType === "take-away" ? "bg-blue-50 text-blue-500" : "bg-accentLight text-primary"} ${isRemoved ? "opacity-50" : ""}`}
                                 >
-                                  {item.orderType}
+                                  {order.orderType === "take-away" ? "Takeaway" : "Dine In"}
                                 </span>
                                 {item.instructions && (
                                   <span className="text-[11px] text-inkLight italic truncate max-w-[130px]">
