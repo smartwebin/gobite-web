@@ -77,7 +77,7 @@ export function Header({
         </div>
 
         <div className="flex items-center gap-2">
-          {user && (
+          {user && !user.is_guest && (
             <button
               onClick={() => router.push("/dashboard")}
               className={`flex items-center gap-1.5 bg-accentLight px-2.5 py-1.5 rounded-full mr-1 hover:bg-[#FFDAC8] transition-colors cursor-pointer`}
@@ -93,12 +93,24 @@ export function Header({
 
           {rightAction}
 
-          <button
-            onClick={() => router.push("/orders")}
-            className="w-10 h-10 rounded-full flex items-center justify-center bg-bgBase hover:bg-gray-200 transition-colors"
-          >
-            <Clock size={20} className="text-inkMid" />
-          </button>
+          {/* Orders if logged in, Login if not */}
+          {user && !user.is_guest ? (
+            <button
+              onClick={() => router.push("/orders")}
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-bgBase hover:bg-gray-200 transition-colors"
+              title="Order History"
+            >
+              <Clock size={20} className="text-inkMid" />
+            </button>
+          ) : (
+            <button
+              onClick={() => router.push("/")}
+              className="flex items-center gap-1.5 px-3 py-2 bg-primary hover:bg-primaryHover text-white text-xs font-bold rounded-full transition-colors"
+            >
+              Login
+            </button>
+          )}
+
           {showCart && (
             <button
               onClick={() => router.push("/cart")}

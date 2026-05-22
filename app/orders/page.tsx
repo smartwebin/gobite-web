@@ -18,6 +18,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { Header } from "../../components/ui/Header";
+import { PrivateRoute } from "../../components/ui/PrivateRoute";
 import { StatusBadge } from "../../components/ui/StatusBadge";
 import { useStore } from "../../context/StoreContext";
 import { Order } from "../../utils/types";
@@ -44,30 +45,33 @@ export default function OrdersPage() {
 
   if (orders.length === 0) {
     return (
-      <div className="flex-1 flex flex-col bg-bgBase min-h-screen">
-        <Header title="Your Orders" showBack />
-        <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6 shadow-inner">
-            <Clock size={40} className="text-inkLight" />
+      <PrivateRoute>
+        <div className="flex-1 flex flex-col bg-bgBase min-h-screen">
+          <Header title="Your Orders" showBack />
+          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6 shadow-inner">
+              <Clock size={40} className="text-inkLight" />
+            </div>
+            <h2 className="text-2xl font-black text-ink tracking-tight mb-2">
+              No past orders
+            </h2>
+            <p className="text-inkMid text-sm mb-8 leading-relaxed">
+              It looks like you haven't placed any orders with us yet.
+            </p>
+            <button
+              onClick={() => router.push("/menu")}
+              className="bg-primary hover:bg-primaryHover text-white font-bold py-4 px-10 rounded-2xl shadow-lg transition-transform active:scale-[0.98]"
+            >
+              Start Ordering
+            </button>
           </div>
-          <h2 className="text-2xl font-black text-ink tracking-tight mb-2">
-            No past orders
-          </h2>
-          <p className="text-inkMid text-sm mb-8 leading-relaxed">
-            It looks like you haven't placed any orders with us yet.
-          </p>
-          <button
-            onClick={() => router.push("/menu")}
-            className="bg-primary hover:bg-primaryHover text-white font-bold py-4 px-10 rounded-2xl shadow-lg transition-transform active:scale-[0.98]"
-          >
-            Start Ordering
-          </button>
         </div>
-      </div>
+      </PrivateRoute>
     );
   }
 
   return (
+    <PrivateRoute>
     <div className="flex flex-col bg-bgBase min-h-screen">
       <Header title="Order History" showBack />
 
@@ -287,5 +291,6 @@ export default function OrdersPage() {
         })}
       </main>
     </div>
+    </PrivateRoute>
   );
 }

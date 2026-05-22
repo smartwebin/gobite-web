@@ -23,6 +23,7 @@ export default function SettingsPage() {
     email: user?.email || "",
     currentPassword: "",
     newPassword: "",
+    confirmPassword: "",
   });
 
   useEffect(() => {
@@ -68,6 +69,10 @@ export default function SettingsPage() {
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (form.newPassword !== form.confirmPassword) {
+      setError("New password and confirm password do not match.");
+      return;
+    }
     setLoading(true);
     setError("");
     setMessage("");
@@ -80,7 +85,7 @@ export default function SettingsPage() {
       });
       if (resp.status === "success") {
         setMessage("Password updated successfully!");
-        setForm({ ...form, currentPassword: "", newPassword: "" });
+        setForm({ ...form, currentPassword: "", newPassword: "", confirmPassword: "" });
       } else {
         setError(resp.message || "Password update failed.");
       }
@@ -248,6 +253,24 @@ export default function SettingsPage() {
                     required
                     minLength={6}
                   />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-inkMid uppercase tracking-wider">Confirm New Password</label>
+                  <input
+                    type="password"
+                    value={form.confirmPassword}
+                    onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+                    className={`w-full border-2 rounded-xl px-4 py-3 text-ink focus:outline-none ${
+                      form.confirmPassword && form.confirmPassword !== form.newPassword
+                        ? "border-red-400 focus:border-red-400 bg-red-50"
+                        : "border-borderLite focus:border-primary"
+                    }`}
+                    required
+                    minLength={6}
+                  />
+                  {form.confirmPassword && form.confirmPassword !== form.newPassword && (
+                    <p className="text-xs text-red-500 font-medium mt-1">Passwords do not match</p>
+                  )}
                 </div>
                 <button
                   type="submit"

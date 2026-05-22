@@ -15,6 +15,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { Header } from "../../components/ui/Header";
+import { PrivateRoute } from "../../components/ui/PrivateRoute";
 import { QrScannerModal } from "../../components/ui/QrScannerModal";
 import { useStore } from "../../context/StoreContext";
 
@@ -81,6 +82,7 @@ export default function DashboardPage() {
   ].filter(i => !i.hide);
 
   return (
+    <PrivateRoute>
     <div className="flex flex-col bg-bgBase min-h-screen">
       <Header title="Dashboard" />
 
@@ -188,5 +190,6 @@ export default function DashboardPage() {
 
       <QrScannerModal isOpen={isScanning} onClose={() => setIsScanning(false)} />
     </div>
+    </PrivateRoute>
   );
 }

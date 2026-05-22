@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Header } from "../../components/ui/Header";
+import { PrivateRoute } from "../../components/ui/PrivateRoute";
 import { Phone, Mail, HelpCircle, MessageCircle, MapPin } from "lucide-react";
 import { apiClient } from "../../utils/apiClient";
 
@@ -26,6 +27,7 @@ export default function SupportPage() {
   };
 
   return (
+    <PrivateRoute>
     <div className="flex-1 flex flex-col bg-bgBase min-h-screen">
       <Header title="Support" showBack />
       <main className="flex-1 p-6 max-w-3xl mx-auto w-full space-y-6 py-12">
@@ -134,6 +136,7 @@ export default function SupportPage() {
         </div>
       </main>
     </div>
+    </PrivateRoute>
   );
 }
 
