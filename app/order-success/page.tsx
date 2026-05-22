@@ -82,7 +82,7 @@ export default function OrderSuccessPage() {
           <div className="flex justify-between items-center mb-4 text-sm">
             <span className="text-inkMid font-medium">Total Items</span>
             <span className="font-bold text-ink">
-              {latestOrder?.items.reduce((sum, item) => sum + item.quantity, 0) || 0}
+              {latestOrder?.items.reduce((sum: number, item: any) => sum + item.quantity, 0) || 0}
             </span>
           </div>
           <div className="h-px border-t border-dashed border-gray-300 w-full mb-4" />
