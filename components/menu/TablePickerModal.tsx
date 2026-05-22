@@ -121,40 +121,16 @@ export function TablePickerModal({ isOpen, onClose }: TablePickerModalProps) {
             {/* Body */}
             <div className="flex-1 overflow-y-auto p-5 space-y-5">
 
-              {/* Takeaway option */}
-              <div className="space-y-2">
-                <p className="text-[11px] font-bold text-inkLight uppercase tracking-widest">Option</p>
-                <button
-                  onClick={() => setSelectedOption("Takeaway")}
-                  className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
-                    selectedOption === "Takeaway"
-                      ? "border-primary bg-accentLight"
-                      : "border-borderLite bg-white hover:bg-gray-50"
-                  }`}
-                >
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    selectedOption === "Takeaway" ? "bg-primary/10" : "bg-gray-100"
-                  }`}>
-                    <Luggage size={18} className={selectedOption === "Takeaway" ? "text-primary" : "text-inkMid"} />
-                  </div>
-                  <div className="flex-1 text-left">
-                    <p className={`font-bold text-sm ${selectedOption === "Takeaway" ? "text-primary" : "text-ink"}`}>
-                      Takeaway / Pickup
-                    </p>
-                    <p className="text-xs text-inkMid">Order to go</p>
-                  </div>
-                  {selectedOption === "Takeaway" && (
-                    <div className="w-3 h-3 rounded-full bg-primary flex-shrink-0" />
-                  )}
-                </button>
-              </div>
-
-              {/* Tables grid */}
+              {/* Tables grid — PRIMARY section */}
               {availableTables.length > 0 && (
                 <div className="space-y-3">
-                  <p className="text-[11px] font-bold text-inkLight uppercase tracking-widest">
-                    Tables
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <Armchair size={14} className="text-primary flex-shrink-0" />
+                    <p className="text-[11px] font-bold text-ink uppercase tracking-widest">
+                      Choose Your Table
+                    </p>
+                    <div className="flex-1 h-px bg-borderLite" />
+                  </div>
                   <div className="grid grid-cols-3 gap-2.5">
                     {availableTables.map((table) => {
                       const isEngaged = table.status !== "available";
@@ -164,12 +140,12 @@ export function TablePickerModal({ isOpen, onClose }: TablePickerModalProps) {
                       const isSelected = selectedOption === table.table_number;
 
                       let cardCls =
-                        "relative flex flex-col items-center justify-center gap-1 py-3 px-2 rounded-xl border-2 transition-all text-center cursor-pointer select-none ";
+                        "relative flex flex-col items-center justify-center gap-1 py-4 px-2 rounded-xl border-2 transition-all text-center cursor-pointer select-none ";
                       let labelCls = "font-bold text-sm leading-tight ";
                       let subCls = "text-[10px] font-semibold leading-tight ";
 
                       if (isSelected) {
-                        cardCls += "border-primary bg-accentLight shadow-sm ";
+                        cardCls += "border-primary bg-accentLight shadow-md ";
                         labelCls += "text-primary ";
                         subCls += "text-primary/70 ";
                       } else if (isMine) {
@@ -201,7 +177,7 @@ export function TablePickerModal({ isOpen, onClose }: TablePickerModalProps) {
                           }
                         >
                           {/* Status icon */}
-                          <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                             isMine
                               ? "bg-primary/10"
                               : isEngaged
@@ -209,11 +185,11 @@ export function TablePickerModal({ isOpen, onClose }: TablePickerModalProps) {
                               : "bg-green-50"
                           }`}>
                             {isMine ? (
-                              <UserCheck size={13} className="text-primary" />
+                              <UserCheck size={15} className="text-primary" />
                             ) : isEngaged ? (
-                              <Lock size={11} className="text-inkLight" />
+                              <Lock size={13} className="text-inkLight" />
                             ) : (
-                              <Armchair size={13} className="text-green-500" />
+                              <Armchair size={15} className="text-green-500" />
                             )}
                           </div>
 
@@ -247,6 +223,39 @@ export function TablePickerModal({ isOpen, onClose }: TablePickerModalProps) {
                   </div>
                 </div>
               )}
+
+              {/* OR divider */}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-borderLite" />
+                <span className="text-[10px] font-bold text-inkLight tracking-widest uppercase">Or</span>
+                <div className="flex-1 h-px bg-borderLite" />
+              </div>
+
+              {/* Takeaway — secondary option at the bottom */}
+              <button
+                onClick={() => setSelectedOption("Takeaway")}
+                className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                  selectedOption === "Takeaway"
+                    ? "border-primary bg-accentLight"
+                    : "border-borderLite bg-white hover:bg-gray-50"
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  selectedOption === "Takeaway" ? "bg-primary/10" : "bg-gray-100"
+                }`}>
+                  <Luggage size={20} className={selectedOption === "Takeaway" ? "text-primary" : "text-inkMid"} />
+                </div>
+                <div className="flex-1 text-left">
+                  <p className={`font-bold text-sm ${selectedOption === "Takeaway" ? "text-primary" : "text-ink"}`}>
+                    Takeaway / Pickup
+                  </p>
+                  <p className="text-xs text-inkMid">Skip the table, order to go</p>
+                </div>
+                {selectedOption === "Takeaway" && (
+                  <div className="w-3 h-3 rounded-full bg-primary flex-shrink-0" />
+                )}
+              </button>
+
             </div>
 
             {/* Footer CTA */}
