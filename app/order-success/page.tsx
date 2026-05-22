@@ -2,15 +2,37 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight, Check, ListChecks } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useStore } from "../../context/StoreContext";
+import { apiClient } from "../../utils/apiClient";
 
 export default function OrderSuccessPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { orders } = useStore();
   const [countdown, setCountdown] = useState(10);
-  const latestOrder = orders[0];
+  const [orderDetail, setOrderDetail] = useState<any>(null);
+
+  // Prefer URL param order_id for reliability (works for guests with no orders state)
+  const urlOrderId = searchParams.get("order_id");
+
+  useEffect(() => {
+    if (urlOrderId) {
+      // Fetch order details directly by ID
+      apiClient.get(`get-orders.php?order_id=${urlOrderId}`)
+        .then((res) => {
+          if (res.status === "success" && res.data) {
+            const d = Array.isArray(res.data) ? res.data[0] : res.data;
+            if (d) setOrderDetail(d);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [urlOrderId]);
+
+  // Merge: prefer fresh-fetched detail, fall back to context orders[0]
+  const latestOrder = orderDetail || orders.find(o => o.id === urlOrderId) || orders[0];
 
   useEffect(() => {
     if (countdown <= 0) {

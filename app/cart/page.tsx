@@ -34,6 +34,7 @@ export default function CartPage() {
     user,
     restaurantInfo,
     fetchOrders,
+    login,
   } = useStore();
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -68,10 +69,13 @@ export default function CartPage() {
         try {
           const guestRes = await apiClient.post("guest-login.php", {});
           if (guestRes.status === "success" && guestRes.data?.token) {
-            // Store the guest token so subsequent requests use it
             const { setAuthToken } = await import("../../utils/apiClient");
             setAuthToken(guestRes.data.token);
             currentUserId = guestRes.data.user?.id ? parseInt(guestRes.data.user.id) : null;
+            // Set the user in context so fetchOrders() can use the ID
+            if (guestRes.data.user) {
+              login({ ...guestRes.data.user, role: "customer", name: "Guest", phone: "" });
+            }
           }
         } catch (guestErr) {
           console.warn("Guest login failed, proceeding as anonymous:", guestErr);
