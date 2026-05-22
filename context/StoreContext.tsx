@@ -67,6 +67,9 @@ interface StoreContextType {
   restaurantInfo: any;
   fetchOrders: (userIdOverride?: string) => Promise<void>;
   refreshData: (rid: string) => Promise<void>;
+  engageTable: (tableId: string) => Promise<boolean>;
+  unengageTable: (tableId: string) => Promise<boolean>;
+  refreshTables: () => Promise<void>;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -606,6 +609,63 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
     }
   };
 
+  const refreshTables = async () => {
+    const rid = restaurantId;
+    if (!rid || rid === "default") return;
+    try {
+      const tablesRes = await apiClient.get(`get-tables.php?restaurant_id=${rid}`);
+      if (tablesRes.status === "success" && Array.isArray(tablesRes.data)) {
+        setAvailableTables(
+          tablesRes.data.map((t: any) => ({
+            id: t.id.toString(),
+            table_number: t.table_number.toString(),
+            status: t.status,
+            engaged_by_user_id: t.engaged_by_user_id?.toString(),
+          }))
+        );
+      }
+    } catch (e) {
+      console.error("Failed to refresh tables:", e);
+    }
+  };
+
+  const engageTable = async (tableId: string): Promise<boolean> => {
+    if (!user?.id || !restaurantId || restaurantId === "default") return false;
+    try {
+      const res = await apiClient.post("update-table.php", {
+        action: "engage",
+        table_id: tableId,
+        user_id: user.id,
+        restaurant_id: parseInt(restaurantId),
+      });
+      if (res.status === "success") {
+        await refreshTables();
+        return true;
+      }
+    } catch (e) {
+      console.error("Engage table failed:", e);
+    }
+    return false;
+  };
+
+  const unengageTable = async (tableId: string): Promise<boolean> => {
+    if (!restaurantId || restaurantId === "default") return false;
+    try {
+      const res = await apiClient.post("update-table.php", {
+        action: "unengage",
+        table_id: tableId,
+        restaurant_id: parseInt(restaurantId),
+      });
+      if (res.status === "success") {
+        await refreshTables();
+        return true;
+      }
+    } catch (e) {
+      console.error("Unengage table failed:", e);
+    }
+    return false;
+  };
+
   return (
     <StoreContext.Provider
       value={{
@@ -638,6 +698,9 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
         restaurantInfo,
         fetchOrders,
         refreshData,
+        engageTable,
+        unengageTable,
+        refreshTables,
       }}
     >
       {children}

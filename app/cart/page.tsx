@@ -61,13 +61,26 @@ export default function CartPage() {
     setError("");
 
     try {
-      // Find table ID from tableNumber if possible, or just send the table info
-      // Our API expects table_id (int). We might need a small mapping or just use id.
-      // For now, I'll send restaurantId and cart items.
-      
+      // If no user session, create a temporary guest account (same as mobile flow)
+      let currentUserId: number | null = user?.id ? parseInt(user.id) : null;
+
+      if (!user) {
+        try {
+          const guestRes = await apiClient.post("guest-login.php", {});
+          if (guestRes.status === "success" && guestRes.data?.token) {
+            // Store the guest token so subsequent requests use it
+            const { setAuthToken } = await import("../../utils/apiClient");
+            setAuthToken(guestRes.data.token);
+            currentUserId = guestRes.data.user?.id ? parseInt(guestRes.data.user.id) : null;
+          }
+        } catch (guestErr) {
+          console.warn("Guest login failed, proceeding as anonymous:", guestErr);
+        }
+      }
+
       const orderData = {
         restaurant_id: parseInt(restaurantId),
-        user_id: user?.id ? parseInt(user.id) : null,
+        user_id: currentUserId,
         table_id: tableId && tableId !== "0" ? parseInt(tableId) : null,
         order_type: tableNumber === "Takeaway" ? "takeaway" : "dine-in",
         customer_email: email.trim() || undefined,

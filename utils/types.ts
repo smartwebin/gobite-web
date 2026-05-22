@@ -36,7 +36,7 @@ export interface CartItem extends MenuItem {
   actualPrice?: number; // Price before discount
 }
 
-export type UserRole = "customer" | "admin" | "kitchen";
+export type UserRole = "customer" | "admin" | "kitchen" | "manager" | "waiter" | "staff" | "guest";
 
 export interface User {
   id?: string;
