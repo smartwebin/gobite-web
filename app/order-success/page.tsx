@@ -3,23 +3,22 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Check, ListChecks } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useStore } from "../../context/StoreContext";
 import { apiClient } from "../../utils/apiClient";
 
-export default function OrderSuccessPage() {
+// Inner component that uses useSearchParams — must be inside <Suspense>
+function OrderSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { orders } = useStore();
   const [countdown, setCountdown] = useState(10);
   const [orderDetail, setOrderDetail] = useState<any>(null);
 
-  // Prefer URL param order_id for reliability (works for guests with no orders state)
   const urlOrderId = searchParams.get("order_id");
 
   useEffect(() => {
     if (urlOrderId) {
-      // Fetch order details directly by ID
       apiClient.get(`get-orders.php?order_id=${urlOrderId}`)
         .then((res) => {
           if (res.status === "success" && res.data) {
@@ -31,7 +30,6 @@ export default function OrderSuccessPage() {
     }
   }, [urlOrderId]);
 
-  // Merge: prefer fresh-fetched detail, fall back to context orders[0]
   const latestOrder = orderDetail || orders.find(o => o.id === urlOrderId) || orders[0];
 
   useEffect(() => {
@@ -73,7 +71,7 @@ export default function OrderSuccessPage() {
         </h1>
         <p className="text-inkMid text-base mb-10 leading-relaxed">
           Order{" "}
-          <strong className="text-ink">#{latestOrder?.id || "N/A"}</strong> has
+          <strong className="text-ink">#{latestOrder?.id || urlOrderId || "N/A"}</strong> has
           been sent to the kitchen.
         </p>
 
@@ -82,7 +80,7 @@ export default function OrderSuccessPage() {
           <div className="flex justify-between items-center mb-4 text-sm">
             <span className="text-inkMid font-medium">Total Items</span>
             <span className="font-bold text-ink">
-              {latestOrder?.items.reduce((sum: number, item: any) => sum + item.quantity, 0) || 0}
+              {latestOrder?.items?.reduce((sum: number, item: any) => sum + item.quantity, 0) || 0}
             </span>
           </div>
           <div className="h-px border-t border-dashed border-gray-300 w-full mb-4" />
@@ -118,5 +116,18 @@ export default function OrderSuccessPage() {
         </p>
       </motion.div>
     </div>
+  );
+}
+
+// Outer page wraps the content in Suspense (required by Next.js for useSearchParams)
+export default function OrderSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex-1 flex items-center justify-center min-h-screen bg-bgBase">
+        <div className="text-inkMid text-sm">Loading…</div>
+      </div>
+    }>
+      <OrderSuccessContent />
+    </Suspense>
   );
 }
