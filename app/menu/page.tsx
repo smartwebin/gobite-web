@@ -55,9 +55,6 @@ function MenuContent() {
       } else {
         setShowTablePicker(true);
       }
-    } else if (!tableNumber) {
-      // Fallback if no restaurantId yet
-      setShowTablePicker(true);
     }
   }, [tableNumber, restaurantId, user, availableTables, setSessionInfo, fromScan]);
 

@@ -40,9 +40,14 @@ function GetStartedContent() {
   useEffect(() => {
     if (token) {
       handleVerifyToken(token);
-    } else if (user) {
-      // If already logged in and no token, go to dashboard
-      router.push("/dashboard");
+    } else {
+      // Defer by one tick so React commits logout state (setUser(null))
+      // before we check. Without this, router.replace("/") from settings
+      // fires while user is still set → redirect back to dashboard.
+      const timer = setTimeout(() => {
+        if (user) router.push("/dashboard");
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [token, user]);
 
