@@ -15,11 +15,13 @@ function OrderSuccessContent() {
   const [countdown, setCountdown] = useState(10);
   const [orderDetail, setOrderDetail] = useState<any>(null);
 
-  const urlOrderId = searchParams.get("order_id");
+  const urlOrderIds = searchParams.get("order_ids") || searchParams.get("order_id");
+  const idArray = urlOrderIds ? urlOrderIds.split(",") : [];
 
   useEffect(() => {
-    if (urlOrderId) {
-      apiClient.get(`get-orders.php?order_id=${urlOrderId}`)
+    if (idArray.length > 0 && !orderDetail) {
+      // Just fetch the first one for validation or rely on global state
+      apiClient.get(`get-orders.php?order_id=${idArray[0]}`)
         .then((res) => {
           if (res.status === "success" && res.data) {
             const d = Array.isArray(res.data) ? res.data[0] : res.data;
@@ -28,9 +30,15 @@ function OrderSuccessContent() {
         })
         .catch(() => {});
     }
-  }, [urlOrderId]);
+  }, [urlOrderIds]);
 
-  const latestOrder = orderDetail || orders.find(o => o.id === urlOrderId) || orders[0];
+  // Find all matching orders from context
+  const matchedOrders = idArray.length > 0 
+    ? orders.filter(o => idArray.includes(o.id.toString()))
+    : [orders[0]].filter(Boolean);
+    
+  // If we couldn't find them in context yet, fallback to orderDetail
+  const displayOrders = matchedOrders.length > 0 ? matchedOrders : (orderDetail ? [orderDetail] : []);
 
   useEffect(() => {
     if (countdown <= 0) {
@@ -67,12 +75,16 @@ function OrderSuccessContent() {
         className="relative z-10 w-full max-w-sm"
       >
         <h1 className="text-4xl font-black text-ink tracking-tight mb-2">
-          Order Placed!
+          {displayOrders.length > 1 ? "Orders Placed!" : "Order Placed!"}
         </h1>
         <p className="text-inkMid text-base mb-10 leading-relaxed">
-          Order{" "}
-          <strong className="text-ink">#{latestOrder?.id || urlOrderId || "N/A"}</strong> has
-          been sent to the kitchen.
+          {displayOrders.length > 1 ? "Orders " : "Order "}
+          <strong className="text-ink">
+            {displayOrders.length > 0 
+              ? displayOrders.map(o => `#${o.id}`).join(" and ") 
+              : "N/A"}
+          </strong>{" "}
+          have been sent to the kitchen.
         </p>
 
         {/* Receipt Miniature */}
@@ -80,14 +92,14 @@ function OrderSuccessContent() {
           <div className="flex justify-between items-center mb-4 text-sm">
             <span className="text-inkMid font-medium">Total Items</span>
             <span className="font-bold text-ink">
-              {latestOrder?.items?.reduce((sum: number, item: any) => sum + item.quantity, 0) || 0}
+              {displayOrders.reduce((total, o) => total + (o.items?.reduce((sum: number, item: any) => sum + item.quantity, 0) || 0), 0)}
             </span>
           </div>
           <div className="h-px border-t border-dashed border-gray-300 w-full mb-4" />
           <div className="flex justify-between items-center text-base">
             <span className="text-inkMid font-medium">Amount Charged</span>
             <span className="font-black text-xl text-primary">
-              £{latestOrder?.grandTotal?.toFixed(2) || latestOrder?.total?.toFixed(2) || "0.00"}
+              £{displayOrders.reduce((total, o) => total + (o.grandTotal || o.total || 0), 0).toFixed(2)}
             </span>
           </div>
         </div>

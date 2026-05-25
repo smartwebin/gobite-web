@@ -85,7 +85,7 @@ export default function CartPage() {
       const dineInItems = cart.filter(item => item.orderType === "Dining" || item.orderType === "dine-in" as any);
       const takeawayItems = cart.filter(item => item.orderType === "Takeaway" || item.orderType === "takeaway" as any);
       
-      let lastOrderId = null;
+      let placedOrderIds: string[] = [];
 
       const placeOrderForType = async (items: CartItem[], type: "dine-in" | "takeaway") => {
         if (items.length === 0) return;
@@ -108,7 +108,9 @@ export default function CartPage() {
         if (resp.status !== "success") {
           throw new Error(resp.message || `Failed to place ${type} order.`);
         }
-        lastOrderId = resp.data.order_id;
+        if (resp.data?.order_id) {
+          placedOrderIds.push(resp.data.order_id.toString());
+        }
       };
 
       if (dineInItems.length > 0) await placeOrderForType(dineInItems, "dine-in");
@@ -118,7 +120,7 @@ export default function CartPage() {
       clearCart();
       setIsProcessing(false);
       setShowEmailModal(false);
-      router.push(`/order-success${lastOrderId ? `?order_id=${lastOrderId}` : ''}`);
+      router.push(`/order-success${placedOrderIds.length > 0 ? `?order_ids=${placedOrderIds.join(',')}` : ''}`);
     } catch (err: any) {
       setError(err.message || "An error occurred during checkout.");
       setIsProcessing(false);
