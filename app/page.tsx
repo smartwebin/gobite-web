@@ -22,7 +22,7 @@ function GetStartedContent() {
   const token = searchParams.get("token") || searchParams.get("t");
 
   const router = useRouter();
-  const { login, setSessionInfo, user, refreshData } = useStore();
+  const { login, setSessionInfo, user, refreshData, isLoading } = useStore();
   const [view, setView] = useState<AuthView>(token ? "welcome" : "login");
   const [isValidToken, setIsValidToken] = useState(false);
   const [form, setForm] = useState({
@@ -41,15 +41,20 @@ function GetStartedContent() {
     if (token) {
       handleVerifyToken(token);
     } else {
-      // Defer by one tick so React commits logout state (setUser(null))
-      // before we check. Without this, router.replace("/") from settings
-      // fires while user is still set → redirect back to dashboard.
       const timer = setTimeout(() => {
         if (user) router.push("/dashboard");
       }, 0);
       return () => clearTimeout(timer);
     }
   }, [token, user]);
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-[#F7F5F2] min-h-screen">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   const handleVerifyToken = async (t: string) => {
     setLoading(true);

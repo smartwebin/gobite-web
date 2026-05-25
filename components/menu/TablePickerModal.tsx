@@ -153,7 +153,7 @@ export function TablePickerModal({ isOpen, onClose }: TablePickerModalProps) {
                         labelCls += "text-primary ";
                         subCls += "text-primary/60 ";
                       } else if (isEngaged) {
-                        cardCls += "border-borderLite bg-gray-50 opacity-70 ";
+                        cardCls += "border-borderLite bg-gray-50 opacity-70 cursor-not-allowed ";
                         labelCls += "text-inkLight ";
                         subCls += "text-inkLight/70 ";
                       } else {
@@ -166,7 +166,10 @@ export function TablePickerModal({ isOpen, onClose }: TablePickerModalProps) {
                       return (
                         <button
                           key={table.id}
-                          onClick={() => setSelectedOption(table.table_number)}
+                          onClick={() => {
+                            if (isEngaged && !isMine) return;
+                            setSelectedOption(table.table_number);
+                          }}
                           className={cardCls}
                           title={
                             isMine

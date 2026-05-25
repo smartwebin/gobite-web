@@ -82,34 +82,43 @@ export default function CartPage() {
         }
       }
 
-      const orderData = {
-        restaurant_id: parseInt(restaurantId),
-        user_id: currentUserId,
-        table_id: tableId && tableId !== "0" ? parseInt(tableId) : null,
-        order_type: tableNumber === "Takeaway" ? "takeaway" : "dine-in",
-        customer_email: email.trim() || undefined,
-        items: cart.map(item => ({
-          id: parseInt(item.id),
-          quantity: item.quantity,
-          instructions: item.instructions || "",
-          variant_id: item.selectedVariant ? parseInt(item.selectedVariant.id) : null,
-          allergies: item.allergies || [],
-          customAllergy: item.customAllergy || "",
-        }))
+      const dineInItems = cart.filter(item => item.orderType === "Dining" || item.orderType === "dine-in" as any);
+      const takeawayItems = cart.filter(item => item.orderType === "Takeaway" || item.orderType === "takeaway" as any);
+      
+      let lastOrderId = null;
+
+      const placeOrderForType = async (items: CartItem[], type: "dine-in" | "takeaway") => {
+        if (items.length === 0) return;
+        const orderData = {
+          restaurant_id: parseInt(restaurantId),
+          user_id: currentUserId,
+          table_id: type === "dine-in" && tableId && tableId !== "0" ? parseInt(tableId) : null,
+          order_type: type,
+          customer_email: email.trim() || undefined,
+          items: items.map(item => ({
+            id: parseInt(item.id),
+            quantity: item.quantity,
+            instructions: item.instructions || "",
+            variant_id: item.selectedVariant ? parseInt(item.selectedVariant.id) : null,
+            allergies: item.allergies || [],
+            customAllergy: item.customAllergy || "",
+          }))
+        };
+        const resp = await apiClient.post("place-order.php", orderData);
+        if (resp.status !== "success") {
+          throw new Error(resp.message || `Failed to place ${type} order.`);
+        }
+        lastOrderId = resp.data.order_id;
       };
 
-      const resp = await apiClient.post("place-order.php", orderData);
+      if (dineInItems.length > 0) await placeOrderForType(dineInItems, "dine-in");
+      if (takeawayItems.length > 0) await placeOrderForType(takeawayItems, "takeaway");
 
-      if (resp.status === "success") {
-        await fetchOrders();
-        clearCart();
-        setIsProcessing(false);
-        setShowEmailModal(false);
-        router.push(`/order-success?order_id=${resp.data.order_id}`);
-      } else {
-        setError(resp.message || "Failed to place order.");
-        setIsProcessing(false);
-      }
+      await fetchOrders();
+      clearCart();
+      setIsProcessing(false);
+      setShowEmailModal(false);
+      router.push(`/order-success${lastOrderId ? `?order_id=${lastOrderId}` : ''}`);
     } catch (err: any) {
       setError(err.message || "An error occurred during checkout.");
       setIsProcessing(false);
@@ -140,6 +149,9 @@ export default function CartPage() {
       </div>
     );
   }
+
+  const dineInItems = cart.filter(item => item.orderType === "Dining" || item.orderType === "dine-in" as any);
+  const takeawayItems = cart.filter(item => item.orderType === "Takeaway" || item.orderType === "takeaway" as any);
 
   return (
     <div className="flex-1 flex flex-col bg-bgBase min-h-screen relative pb-32">
@@ -176,23 +188,48 @@ export default function CartPage() {
           </div>
 
           {/* Cart Items */}
-          <div className="space-y-3">
-            {cart.map((item) => (
-              <div
-                key={item.cartId}
-                onClick={() => setEditingItem(item)}
-                className="cursor-pointer transition-transform active:scale-[0.98]"
-              >
-                <CartItemCard
-                  item={item}
-                  onUpdate={(qty) => {
-                    // Stop propagation inside onUpdate/onRemove not fully necessary as we handle it inside CartItemCard, but better safe.
-                    updateQuantity(item.cartId, qty);
-                  }}
-                  onRemove={() => removeFromCart(item.cartId)}
-                />
+          <div className="space-y-6">
+            {dineInItems.length > 0 && (
+              <div>
+                <h3 className="font-bold text-ink text-sm mb-2 uppercase tracking-wider pl-1 text-primary">Dine In</h3>
+                <div className="space-y-3">
+                  {dineInItems.map((item) => (
+                    <div
+                      key={item.cartId}
+                      onClick={() => setEditingItem(item)}
+                      className="cursor-pointer transition-transform active:scale-[0.98]"
+                    >
+                      <CartItemCard
+                        item={item}
+                        onUpdate={(qty) => updateQuantity(item.cartId, qty)}
+                        onRemove={() => removeFromCart(item.cartId)}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
-            ))}
+            )}
+            
+            {takeawayItems.length > 0 && (
+              <div>
+                <h3 className="font-bold text-ink text-sm mb-2 uppercase tracking-wider pl-1 text-primary">Takeaway</h3>
+                <div className="space-y-3">
+                  {takeawayItems.map((item) => (
+                    <div
+                      key={item.cartId}
+                      onClick={() => setEditingItem(item)}
+                      className="cursor-pointer transition-transform active:scale-[0.98]"
+                    >
+                      <CartItemCard
+                        item={item}
+                        onUpdate={(qty) => updateQuantity(item.cartId, qty)}
+                        onRemove={() => removeFromCart(item.cartId)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Allergy Warning */}
