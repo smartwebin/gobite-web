@@ -37,16 +37,7 @@ function GetStartedContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (token) {
-      handleVerifyToken(token);
-    } else {
-      const timer = setTimeout(() => {
-        if (user) router.push("/dashboard");
-      }, 0);
-      return () => clearTimeout(timer);
-    }
-  }, [token, user]);
+  // (Moved useEffect below handler declarations to avoid TDZ errors)
 
   if (isLoading) {
     return (
@@ -99,6 +90,18 @@ function GetStartedContent() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (token) {
+      handleVerifyToken(token);
+    } else {
+      const timer = setTimeout(() => {
+        if (user) router.push("/dashboard");
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [token, user]);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
