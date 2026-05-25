@@ -39,14 +39,6 @@ function GetStartedContent() {
 
   // (Moved useEffect below handler declarations to avoid TDZ errors)
 
-  if (isLoading) {
-    return (
-      <div className="flex-1 flex items-center justify-center bg-[#F7F5F2] min-h-screen">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
   const handleVerifyToken = async (t: string) => {
     setLoading(true);
     setError("");
@@ -101,6 +93,14 @@ function GetStartedContent() {
       return () => clearTimeout(timer);
     }
   }, [token, user]);
+
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center bg-[#F7F5F2] min-h-screen">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
