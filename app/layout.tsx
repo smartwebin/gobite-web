@@ -23,8 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} bg-black text-ink antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.className} bg-black text-ink antialiased`} suppressHydrationWarning>
         <StoreProvider>
           {/* Responsive layout container */}
           <div className="mx-auto flex w-full min-h-screen flex-col bg-bgBase overflow-hidden relative">

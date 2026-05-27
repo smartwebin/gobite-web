@@ -54,11 +54,7 @@ export interface User {
 
 export type OrderStatus =
   | "pending"
-  | "received"
-  | "preparing"
-  | "ready"
-  | "completed"
-  | "delivered"
+  | "accepted"
   | "cancelled";
 
 export interface Order {

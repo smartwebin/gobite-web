@@ -1,6 +1,6 @@
 "use client";
 
-import { ShieldCheck, UtensilsCrossed, MapPin, ChevronDown } from "lucide-react";
+import { ShieldCheck, UtensilsCrossed, MapPin, ChevronDown, Search, X } from "lucide-react";
 import React, { useEffect, useState, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { CartFloatingButton } from "../../components/menu/CartFloatingButton";
@@ -28,6 +28,7 @@ function MenuContent() {
   const [activeType, setActiveType] = useState<"all" | "veg" | "non-veg">("all");
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [showTablePicker, setShowTablePicker] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Derive dynamic categories from menuItems
   const categories = useMemo(() => {
@@ -61,7 +62,10 @@ function MenuContent() {
   const filteredItems = menuItems.filter((item) => {
     const matchesCategory = activeCategory === "All" || item.category === activeCategory;
     const matchesType = activeType === "all" || item.itemType === activeType;
-    return matchesCategory && matchesType;
+    const matchesSearch = !searchQuery || 
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesCategory && matchesType && matchesSearch;
   });
 
   const getSubtitle = () => {
@@ -130,6 +134,28 @@ function MenuContent() {
             </button>
           );
         })}
+      </div>
+
+      {/* Search Bar */}
+      <div className="px-4 md:px-8 py-3 bg-bgBase">
+        <div className="relative">
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-inkLight" />
+          <input
+            type="text"
+            placeholder="Search for a dish..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-white border border-borderLite rounded-xl pl-10 pr-10 py-3 text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-ink placeholder:text-inkLight"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-inkLight hover:text-ink transition-colors"
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full relative z-10">

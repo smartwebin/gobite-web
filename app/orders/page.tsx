@@ -82,8 +82,7 @@ export default function OrdersPage() {
           const isExpanded = expandedOrder === order.id;
           const isActive =
             order.status === "pending" ||
-            order.status === "preparing" ||
-            order.status === "ready";
+            order.status === "accepted";
           const d = new Date(order.date);
           const dateString = d.toLocaleDateString("en-US", {
             month: "short",

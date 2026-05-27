@@ -2,26 +2,9 @@ import React from "react";
 import { OrderStatus } from "../../utils/types";
 // test
 export function StatusBadge({ status }: { status: OrderStatus }) {
-  const map: Record<OrderStatus, { bg: string; text: string; label: string }> =
-  {
+  const map: Record<OrderStatus, { bg: string; text: string; label: string }> = {
     pending: { bg: "bg-amber-50", text: "text-amber-600", label: "Pending" },
-    received: { bg: "bg-blue-100", text: "text-blue-700", label: "Received" },
-    preparing: {
-      bg: "bg-orange-50",
-      text: "text-orange-600",
-      label: "Cooking",
-    },
-    ready: { bg: "bg-green-50", text: "text-green-600", label: "Ready" },
-    delivered: {
-      bg: "bg-green-100",
-      text: "text-green-700",
-      label: "Delivered",
-    },
-    completed: {
-      bg: "bg-gray-100",
-      text: "text-gray-600",
-      label: "Completed",
-    },
+    accepted: { bg: "bg-green-50", text: "text-green-600", label: "Accepted" },
     cancelled: { bg: "bg-red-50", text: "text-red-600", label: "Cancelled" },
   };
 
