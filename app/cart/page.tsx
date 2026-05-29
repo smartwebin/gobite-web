@@ -41,7 +41,7 @@ export default function CartPage() {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [editingItem, setEditingItem] = useState<CartItem | null>(null);
   const [email, setEmail] = useState("");
-  const [acceptTerms, setAcceptTerms] = useState(true);
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [error, setError] = useState("");
 
   const subtotal = cart.reduce(

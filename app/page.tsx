@@ -94,7 +94,9 @@ function GetStartedContent() {
     }
   }, [token, user]);
 
-  if (isLoading) {
+  // If we are still loading, or if we have a user (about to redirect to dashboard/menu),
+  // or if we have a token and are currently verifying it (loading=true), show the spinner to prevent flicker.
+  if (isLoading || user || (token && loading)) {
     return (
       <div className="flex-1 flex items-center justify-center bg-[#F7F5F2] min-h-screen">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -177,8 +179,8 @@ function GetStartedContent() {
       setError("Please fill in name and password.");
       return;
     }
-    if (!form.email.trim() && !form.phone.trim()) {
-      setError("Please provide either an email or a phone number.");
+    if (!form.email.trim()) {
+      setError("Please provide your email address.");
       return;
     }
     if (form.phone.trim() && !/^\d{11}$/.test(form.phone.trim())) {
@@ -426,7 +428,7 @@ function GetStartedContent() {
 
               <div className="space-y-1">
                 <label className="text-[11px] font-bold text-inkMid uppercase tracking-wider ml-1">
-                  Phone
+                  Phone (Optional)
                 </label>
                 <div className="relative">
                   <Phone size={16} className="absolute text-inkLight left-3 top-1/2 -translate-y-1/2" />
