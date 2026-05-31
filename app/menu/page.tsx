@@ -23,6 +23,7 @@ export default function MenuPage() {
 function MenuContent() {
   const searchParams = useSearchParams();
   const fromScan = searchParams.get("from_scan") === "1";
+  const pickTable = searchParams.get("pick_table") === "1";
   const { tableNumber, setSessionInfo, menuItems, restaurantInfo, restaurantId, user, availableTables } = useStore();
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeType, setActiveType] = useState<"all" | "veg" | "non-veg">("all");
@@ -38,16 +39,16 @@ function MenuContent() {
 
   const hotelName = restaurantInfo?.name || "GoBite";
 
-  // If arrived via QR scan, ALWAYS force the table picker open
+  // If arrived via QR scan or pick_table flag, ALWAYS force the table picker open
   useEffect(() => {
-    if (fromScan) {
+    if (fromScan || pickTable) {
       setShowTablePicker(true);
     }
-  }, [fromScan]);
+  }, [fromScan, pickTable]);
 
   useEffect(() => {
-    // Skip if fromScan already triggered the picker
-    if (fromScan) return;
+    // Skip if fromScan or pickTable already triggered the picker
+    if (fromScan || pickTable) return;
     if (restaurantId && restaurantId !== "default" && !tableNumber && (!user || user.role === "customer")) {
       const myEngagedTable = availableTables.find((t: any) => t.engaged_by_user_id?.toString() === user?.id?.toString());
       if (myEngagedTable) {
@@ -57,7 +58,7 @@ function MenuContent() {
         setShowTablePicker(true);
       }
     }
-  }, [tableNumber, restaurantId, user, availableTables, setSessionInfo, fromScan]);
+  }, [tableNumber, restaurantId, user, availableTables, setSessionInfo, fromScan, pickTable]);
 
   const filteredItems = menuItems.filter((item) => {
     const matchesCategory = activeCategory === "All" || item.category === activeCategory;

@@ -27,7 +27,7 @@ export function Header({
   rightAction,
 }: HeaderProps) {
   const router = useRouter();
-  const { cart, user, logout } = useStore();
+  const { cart, user, logout, tableNumber } = useStore();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
@@ -77,7 +77,7 @@ export function Header({
         </div>
 
         <div className="flex items-center gap-2">
-          {user && !user.is_guest && (
+          {user && (
             <button
               onClick={() => router.push("/dashboard")}
               className={`flex items-center gap-1.5 bg-accentLight px-2.5 py-1.5 rounded-full mr-1 hover:bg-[#FFDAC8] transition-colors cursor-pointer`}
@@ -86,7 +86,7 @@ export function Header({
                 <User size={12} />
               </div>
               <span className="text-xs font-semibold text-primary max-w-[72px] truncate">
-                {user.name.split(" ")[0]}
+                {user.is_guest ? "Guest" : user.name.split(" ")[0]}
               </span>
             </button>
           )}
@@ -94,7 +94,7 @@ export function Header({
           {rightAction}
 
           {/* Orders if logged in, Login if not */}
-          {user && !user.is_guest ? (
+          {user ? (
             <button
               onClick={() => router.push("/orders")}
               className="w-10 h-10 rounded-full flex items-center justify-center bg-bgBase hover:bg-gray-200 transition-colors"
@@ -113,7 +113,13 @@ export function Header({
 
           {showCart && (
             <button
-              onClick={() => router.push("/cart")}
+              onClick={() => {
+                if (!tableNumber) {
+                  router.push("/menu?pick_table=1");
+                } else {
+                  router.push("/cart");
+                }
+              }}
               className="w-10 h-10 rounded-full flex items-center justify-center bg-bgBase relative hover:bg-gray-200 transition-colors"
             >
               <ShoppingBag size={18} className="text-ink" />

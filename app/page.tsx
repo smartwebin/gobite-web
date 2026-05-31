@@ -115,6 +115,9 @@ function GetStartedContent() {
     try {
       const resp = await apiClient.post("guest-login.php", {});
       if (resp.status === "success") {
+        if (resp.data?.token) {
+          setAuthToken(resp.data.token);
+        }
         login({
           id: resp.data.user.id.toString(),
           name: resp.data.user.name,

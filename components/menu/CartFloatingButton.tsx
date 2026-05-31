@@ -8,7 +8,7 @@ import { useStore } from "../../context/StoreContext";
 
 export function CartFloatingButton() {
   const router = useRouter();
-  const { cart } = useStore();
+  const { cart, tableNumber } = useStore();
 
   if (cart.length === 0) return null;
 
@@ -28,7 +28,13 @@ export function CartFloatingButton() {
         className="fixed bottom-6 left-0 right-0 z-40 mx-auto px-4 w-full max-w-md"
       >
         <button
-          onClick={() => router.push("/cart")}
+          onClick={() => {
+            if (!tableNumber) {
+              router.push("/menu?pick_table=1");
+            } else {
+              router.push("/cart");
+            }
+          }}
           className="w-full bg-primary hover:bg-primaryHover text-white rounded-2xl p-4 shadow-[0_8px_30px_rgba(255,107,53,0.4)] flex items-center justify-between transition-transform active:scale-[0.98]"
         >
           <div className="flex items-center gap-3">
