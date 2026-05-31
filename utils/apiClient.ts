@@ -50,6 +50,7 @@ export const apiClient = {
       const response = await fetch(url, {
         ...options,
         headers,
+        cache: 'no-store',
       });
 
       const data = await response.json();
