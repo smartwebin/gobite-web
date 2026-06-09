@@ -48,7 +48,7 @@ export default function CartPage() {
     (acc, item) => acc + item.price * item.quantity,
     0,
   );
-  const serviceFee = subtotal * 0.1;
+  const serviceFee = 0; // subtotal * 0.1;
   const grandTotal = subtotal + serviceFee;
 
   const handleInitialCheckout = () => {
@@ -256,10 +256,7 @@ export default function CartPage() {
                 £{subtotal.toFixed(2)}
               </span>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-inkMid">Service Fee (10%)</span>
-              <span className="font-semibold text-ink">£{serviceFee.toFixed(2)}</span>
-            </div>
+              {/* Service Fee Removed */}
             <div className="h-px w-full bg-borderLite my-2" />
             <div className="flex justify-between items-center pt-1">
               <span className="font-bold text-lg text-ink">Total</span>

@@ -255,14 +255,14 @@ export default function OrdersPage() {
                         £{Number(order.total || 0).toFixed(2)}
                       </span>
                     </div>
-                    {!!order.serviceFee && (
+                    {/* !!order.serviceFee && (
                       <div className="flex justify-between items-center text-[13px] text-inkMid">
                         <span>Service Fee</span>
                         <span className="font-semibold">
                           £{Number(order.serviceFee || 0).toFixed(2)}
                         </span>
                       </div>
-                    )}
+                    ) */}
                     <div className="h-px bg-borderLite my-1" />
                     <div className="flex justify-between items-center">
                       <span className="font-extrabold text-[15px] text-ink">

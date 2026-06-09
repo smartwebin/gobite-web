@@ -560,7 +560,7 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
             );
             const activeItems = updatedItems.filter(i => i.status !== "removed");
             const newSubtotal = activeItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-            const newServiceFee = newSubtotal * 0.1;
+            const newServiceFee = 0; // newSubtotal * 0.1;
             return {
               ...order,
               items: updatedItems,
