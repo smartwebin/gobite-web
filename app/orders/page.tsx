@@ -230,7 +230,7 @@ export default function OrdersPage() {
                             <span className="text-[10px] text-inkLight">
                               £{item.price.toFixed(2)} ea
                             </span>
-                            {order.status === "pending" &&
+                            {/* {order.status === "pending" &&
                               (!item.status || item.status === "active") && (
                                 <button
                                   onClick={() =>
@@ -240,7 +240,7 @@ export default function OrdersPage() {
                                 >
                                   <Trash2 size={13} />
                                 </button>
-                              )}
+                              )} */}
                           </div>
                         </div>
                       );

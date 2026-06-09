@@ -15,15 +15,15 @@ export function MenuItemCard({
 
   return (
     <div
-      className={`group flex flex-row sm:flex-col bg-white rounded-3xl border border-borderLite transition-all duration-300 overflow-hidden ${
+      className={`group flex flex-col bg-white rounded-2xl border border-borderLite transition-all duration-300 overflow-hidden ${
         isAvailable
           ? "hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 cursor-pointer"
-          : "opacity-70 grayscale-[40%]"
+          : "opacity-55 grayscale-[40%]"
       }`}
       onClick={isAvailable ? onClick : undefined}
     >
       {/* Image Wrap */}
-      <div className="relative aspect-square w-32 sm:w-full bg-gray-100 overflow-hidden shrink-0">
+      <div className="relative aspect-square w-full bg-gray-100 overflow-hidden shrink-0">
         <Image
           src={item.image || "/placeholder.png"}
           alt={item.name}
@@ -60,29 +60,32 @@ export function MenuItemCard({
       </div>
 
       {/* Content */}
-      <div className="p-4 flex flex-col flex-1 min-w-0 justify-center sm:justify-start">
-        <div className="flex items-center gap-2 mb-1">
-          <div className={`w-3 h-3 border rounded-sm flex items-center justify-center bg-white shrink-0 ${item.itemType === "veg" ? "border-green-500" : "border-red-500"}`}>
-            <div className={`w-1.5 h-1.5 rounded-full ${item.itemType === "veg" ? "bg-green-500" : "bg-red-500"}`} />
+      <div className="p-2.5 flex flex-col flex-1 min-w-0">
+        <div className="flex flex-col gap-0.5 w-full">
+          <div className="flex items-center gap-1.5 w-full">
+            <div className={`w-2.5 h-2.5 border rounded-[1px] flex items-center justify-center shrink-0 ${item.itemType === "veg" ? "border-green-500" : "border-red-500"}`}>
+              <div className={`w-1 h-1 rounded-full ${item.itemType === "veg" ? "bg-green-500" : "bg-red-500"}`} />
+            </div>
+            <h3 className="font-bold text-ink text-[14px] line-clamp-1 w-full">{item.name}</h3>
           </div>
-          <h3 className="font-bold text-ink text-[15px] line-clamp-1">{item.name}</h3>
-        </div>
-
-        <p className="text-inkLight text-xs line-clamp-2 leading-relaxed h-8 mb-2">
-          {item.description}
-        </p>
-
-        <div className="mt-auto flex items-center justify-between gap-2">
-          <div className="flex flex-col">
-            <span className="text-primary font-black text-base sm:text-lg">
+          
+          <div className="flex items-center gap-1.5 min-h-[20px]">
+            <span className="text-primary font-extrabold text-[14px]">
               £{(item.offerPrice ?? item.price).toFixed(2)}
             </span>
             {item.offerPrice && (
-              <span className="text-[10px] text-inkLight line-through font-bold">
+              <span className="text-[11px] text-inkLight line-through mt-[1px]">
                 £{item.price.toFixed(2)}
               </span>
             )}
           </div>
+        </div>
+
+        <p className="text-inkLight text-[12px] line-clamp-2 leading-[16px] mt-0.5">
+          {item.description}
+        </p>
+
+        <div className="mt-auto pt-1.5 flex items-center justify-between gap-2">
 
           <button
             onClick={(e) => {
@@ -90,14 +93,14 @@ export function MenuItemCard({
               if (isAvailable) onClick();
             }}
             disabled={!isAvailable}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-xs transition-all ${
+            className={`flex items-center justify-center gap-1 w-full py-1.5 rounded-[10px] transition-all ${
               isAvailable 
-                ? "bg-accentLight text-primary hover:bg-primary hover:text-white shadow-sm"
-                : "bg-gray-100 text-inkLight"
+                ? "bg-accentLight text-primary hover:bg-primary hover:text-white"
+                : "bg-[#F0F0F0] text-inkLight"
             }`}
           >
-            <Plus size={14} />
-            <span>{isAvailable ? "ADD" : "OFF"}</span>
+            <Plus size={16} />
+            <span className="text-[12px] font-semibold">{isAvailable ? "Add to order" : "Unavailable"}</span>
           </button>
         </div>
       </div>
