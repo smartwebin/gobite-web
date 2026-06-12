@@ -117,7 +117,7 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
       if (restRes.status === "success") {
         setRestaurantInfo(restRes.data);
         setRestaurantId(restRes.data.id.toString());
-        
+
         // Fetch Menu for this restaurant
         const menuRes = await apiClient.get(`get-menu.php?restaurant_id=${restRes.data.id}`);
         if (menuRes.status === "success" && Array.isArray(menuRes.data?.categorized)) {
@@ -238,10 +238,10 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
 
         // Fetch user specific orders if logged in
         if (currentUser?.id) {
-           const ordRes = await apiClient.get(`get-orders.php?user_id=${currentUser.id}`);
-           if (ordRes.status === "success") {
-              setOrders(ordRes.data);
-           }
+          const ordRes = await apiClient.get(`get-orders.php?user_id=${currentUser.id}`);
+          if (ordRes.status === "success") {
+            setOrders(ordRes.data);
+          }
         }
 
       } catch (e) {
@@ -253,6 +253,16 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
     };
 
     initStore();
+
+    const handleUnauthorized = () => {
+      console.warn("Unauthorized event received. Logging out.");
+      logout();
+    };
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("unauthorized", handleUnauthorized);
+      return () => window.removeEventListener("unauthorized", handleUnauthorized);
+    }
   }, []);
 
   // Sync to localStorage
@@ -260,7 +270,7 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
     if (isInitialized && typeof window !== "undefined") {
       if (user) localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
       else localStorage.removeItem(STORAGE_KEYS.USER);
-      
+
       localStorage.setItem(STORAGE_KEYS.CART, JSON.stringify(cart));
       localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
       localStorage.setItem(STORAGE_KEYS.TABLE, tableNumber);
@@ -315,12 +325,12 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
 
     setCart((prev) => {
       const existing = prev.find((i) => i.cartId === cartId);
-      
+
       // Stock Validation
       if (item.stockType === "limited") {
         const currentQtyInCart = existing ? existing.quantity : 0;
         const requestedTotal = currentQtyInCart + quantity;
-        
+
         if (requestedTotal > (item.stockQuantity || 0)) {
           alert(`Sorry, only ${item.stockQuantity} items available in stock.`);
           return prev;
@@ -367,12 +377,12 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
       const newCartId = `${item.id}-${selectedVariant?.id ?? ""}-${orderType}-${cleanInstructions}-${sortedAllergiesStr}-${cleanCustomAllergy}`;
 
       const existing = filtered.find((i) => i.cartId === newCartId);
-      
+
       // Stock validation
       if (item.stockType === "limited") {
         const currentQtyInCart = existing ? existing.quantity : 0;
         const requestedTotal = currentQtyInCart + quantity;
-        
+
         if (requestedTotal > (item.stockQuantity || 0)) {
           alert(`Sorry, only ${item.stockQuantity} items available in stock.`);
           return prev; // abort
@@ -417,7 +427,7 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
 
   const addOrder = (order: Order) => {
     setOrders((prev) => [order, ...prev]);
-    
+
     // LOCAL STOCK UPDATE: Decrement stock for limited items to keep UI in sync immediately
     setMenuItems((prev) =>
       prev.map((m) => {
@@ -588,13 +598,13 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
     setRestaurantId(restId);
     setTableNumber(table);
     if (tid) setTableId(tid);
-    
+
     if (restId === "default") {
       setRestaurantInfo(null);
       setMenuItems([]);
       setAvailableTables([]);
     }
-    
+
     if (typeof window !== "undefined") {
       if (restId === "default") {
         localStorage.removeItem(STORAGE_KEYS.REST_ID);

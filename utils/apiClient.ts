@@ -53,6 +53,15 @@ export const apiClient = {
         cache: 'no-store',
       });
 
+      if (response.status === 401) {
+        // Clear token if unauthorized (expired/invalid)
+        setAuthToken(null);
+        if (typeof window !== 'undefined') {
+          // Dispatch a custom event to tell the app to log out / reload if needed
+          window.dispatchEvent(new Event('unauthorized'));
+        }
+      }
+
       const data = await response.json();
       return data;
     } catch (error) {
