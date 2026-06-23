@@ -24,7 +24,7 @@ function MenuContent() {
   const searchParams = useSearchParams();
   const fromScan = searchParams.get("from_scan") === "1";
   const pickTable = searchParams.get("pick_table") === "1";
-  const { tableNumber, setSessionInfo, menuItems, restaurantInfo, restaurantId, user, availableTables } = useStore();
+  const { tableNumber, setSessionInfo, menuItems, restaurantInfo, restaurantId, user, availableTables, isLoading } = useStore();
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeType, setActiveType] = useState<"all" | "veg" | "non-veg">("all");
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
@@ -49,6 +49,8 @@ function MenuContent() {
   useEffect(() => {
     // Skip if fromScan or pickTable already triggered the picker
     if (fromScan || pickTable) return;
+    if (isLoading) return; // Wait until store is loaded from localStorage
+    
     if (restaurantId && restaurantId !== "default" && !tableNumber && (!user || user.role === "customer")) {
       const myEngagedTable = availableTables.find((t: any) => t.engaged_by_user_id?.toString() === user?.id?.toString());
       if (myEngagedTable) {
@@ -58,7 +60,7 @@ function MenuContent() {
         setShowTablePicker(true);
       }
     }
-  }, [tableNumber, restaurantId, user, availableTables, setSessionInfo, fromScan, pickTable]);
+  }, [tableNumber, restaurantId, user, availableTables, setSessionInfo, fromScan, pickTable, isLoading]);
 
   const filteredItems = menuItems.filter((item) => {
     const matchesCategory = activeCategory === "All" || item.category === activeCategory;

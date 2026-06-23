@@ -37,40 +37,13 @@ export function TablePickerModal({ isOpen, onClose }: TablePickerModalProps) {
     setIsApplying(true);
     try {
       if (selectedOption === "Takeaway") {
-        // Release any previously engaged table
-        const myOldTable = availableTables.find(
-          (t) => t.engaged_by_user_id?.toString() === user?.id?.toString()
-        );
-        if (myOldTable) await unengageTable(myOldTable.id);
         setSessionInfo(restaurantId, "Takeaway", "0");
       } else {
         const found = availableTables.find(
           (t) => t.table_number === selectedOption
         );
         if (found) {
-          const isEngaged = found.status !== "available";
-          const isMine =
-            found.engaged_by_user_id?.toString() === user?.id?.toString();
-
-          if (isEngaged && !isMine) {
-            // Another user's table — still allow selection (staff or customer choice),
-            // just set session without engaging
-            setSessionInfo(restaurantId, selectedOption, found.id ?? "0");
-          } else {
-            // Release old table if switching
-            const myOldTable = availableTables.find(
-              (t) =>
-                t.engaged_by_user_id?.toString() === user?.id?.toString() &&
-                t.id !== found.id
-            );
-            if (myOldTable) await unengageTable(myOldTable.id);
-
-            // Engage new table (only if it's free)
-            if (!isEngaged) {
-              await engageTable(found.id);
-            }
-            setSessionInfo(restaurantId, selectedOption, found.id ?? "0");
-          }
+          setSessionInfo(restaurantId, selectedOption, found.id ?? "0");
         }
       }
       onClose();

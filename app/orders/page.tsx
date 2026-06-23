@@ -273,17 +273,6 @@ export default function OrdersPage() {
                       </span>
                     </div>
                     
-                    {order.status === "pending" && (
-                      <div className="pt-3 border-t border-borderLite mt-2">
-                        <button
-                          onClick={() => setOrderToCancel(order.id)}
-                          className="w-full flex items-center justify-center gap-2 py-3 bg-red-50 text-red-500 font-bold rounded-xl hover:bg-red-100 transition-colors"
-                        >
-                          <Trash2 size={16} />
-                          Cancel Order
-                        </button>
-                      </div>
-                    )}
                   </div>
                 </motion.div>
               )}
@@ -292,53 +281,6 @@ export default function OrdersPage() {
         })}
       </main>
 
-      {/* Cancel Confirmation Modal */}
-      <AnimatePresence>
-        {orderToCancel && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setOrderToCancel(null)}
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            />
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="relative w-full max-w-sm bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col"
-            >
-              <div className="p-6 text-center flex flex-col items-center">
-                <div className="w-14 h-14 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-4">
-                  <AlertTriangle size={26} />
-                </div>
-                <h3 className="text-xl font-extrabold text-ink mb-2">Cancel Order?</h3>
-                <p className="text-sm text-inkMid mb-6 font-medium">
-                  Are you sure you want to cancel this order? This action cannot be undone.
-                </p>
-                <div className="flex w-full gap-3">
-                  <button
-                    onClick={() => setOrderToCancel(null)}
-                    className="flex-1 py-3 px-4 bg-gray-100 hover:bg-gray-200 text-ink font-bold rounded-xl transition-colors active:scale-95"
-                  >
-                    No, Keep
-                  </button>
-                  <button
-                    onClick={() => {
-                      updateOrderStatus(orderToCancel, "cancelled");
-                      setOrderToCancel(null);
-                    }}
-                    className="flex-1 py-3 px-4 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl shadow-lg shadow-red-500/30 transition-all active:scale-95"
-                  >
-                    Yes, Cancel
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
     </PrivateRoute>
   );

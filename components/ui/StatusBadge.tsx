@@ -3,8 +3,8 @@ import { OrderStatus } from "../../utils/types";
 // test
 export function StatusBadge({ status }: { status: OrderStatus }) {
   const map: Record<OrderStatus, { bg: string; text: string; label: string }> = {
-    pending: { bg: "bg-amber-50", text: "text-amber-600", label: "Pending" },
-    accepted: { bg: "bg-green-50", text: "text-green-600", label: "Accepted" },
+    pending: { bg: "bg-amber-50", text: "text-amber-600", label: "Received" },
+    accepted: { bg: "bg-green-50", text: "text-green-600", label: "Paid" },
     cancelled: { bg: "bg-red-50", text: "text-red-600", label: "Cancelled" },
   };
 
