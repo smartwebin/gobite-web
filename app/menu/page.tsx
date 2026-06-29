@@ -136,7 +136,7 @@ function MenuContent() {
             <button
               key={t.value}
               onClick={() => setActiveType(t.value as any)}
-              className={`flex items-center px-4 py-1.5 rounded-full bg-white border border-borderLite text-xs font-semibold text-inkMid hover:bg-gray-50 transition-all ${
+              className={`flex-shrink-0 whitespace-nowrap flex items-center px-4 py-1.5 rounded-full bg-white border border-borderLite text-xs font-semibold text-inkMid hover:bg-gray-50 transition-all ${
                 active ? activeColorClass : ""
               }`}
             >
