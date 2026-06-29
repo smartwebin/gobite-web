@@ -2,7 +2,7 @@
 
 import { ShieldCheck, UtensilsCrossed, MapPin, ChevronDown, Search, X } from "lucide-react";
 import React, { useEffect, useState, useMemo, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { CartFloatingButton } from "../../components/menu/CartFloatingButton";
 import { CategoryTabs } from "../../components/menu/CategoryTabs";
 import { ItemDetailModal } from "../../components/menu/ItemDetailModal";
@@ -22,6 +22,7 @@ export default function MenuPage() {
 
 function MenuContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const fromScan = searchParams.get("from_scan") === "1";
   const pickTable = searchParams.get("pick_table") === "1";
   const { tableNumber, setSessionInfo, menuItems, restaurantInfo, restaurantId, user, availableTables, isLoading } = useStore();
@@ -207,7 +208,12 @@ function MenuContent() {
       />
       <TablePickerModal
         isOpen={showTablePicker}
-        onClose={() => setShowTablePicker(false)}
+        onClose={() => {
+          setShowTablePicker(false);
+          if (fromScan || pickTable) {
+            router.replace("/menu", { scroll: false });
+          }
+        }}
       />
       <CartFloatingButton />
     </div>
