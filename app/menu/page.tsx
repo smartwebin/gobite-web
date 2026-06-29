@@ -98,7 +98,7 @@ function MenuContent() {
       />
 
       {/* Veg / Non-Veg Type Filters */}
-      <div className="bg-bgBase py-3 px-4 md:px-8 border-b border-borderLite/50 flex gap-2 overflow-x-auto scrollbar-none">
+      <div className="bg-bgBase py-3 px-4 md:px-8 border-b border-borderLite/50 flex gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {[
           { label: "All", value: "all" },
           { label: "Veg", value: "veg" },
