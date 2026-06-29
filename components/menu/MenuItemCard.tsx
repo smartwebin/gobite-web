@@ -63,9 +63,15 @@ export function MenuItemCard({
       <div className="p-2.5 flex flex-col flex-1 min-w-0">
         <div className="flex flex-col gap-0.5 w-full">
           <div className="flex items-center gap-1.5 w-full">
-            <div className={`w-2.5 h-2.5 border rounded-[1px] flex items-center justify-center shrink-0 ${item.itemType === "veg" ? "border-green-500" : "border-red-500"}`}>
-              <div className={`w-1 h-1 rounded-full ${item.itemType === "veg" ? "bg-green-500" : "bg-red-500"}`} />
-            </div>
+            {item.itemType === "na" ? (
+              <div className="w-2.5 h-2.5 border rounded-[1px] flex items-center justify-center shrink-0 border-blue-500">
+                <div className="w-1 h-1 rounded-full bg-blue-500" />
+              </div>
+            ) : (
+              <div className={`w-2.5 h-2.5 border rounded-[1px] flex items-center justify-center shrink-0 ${item.itemType === "veg" ? "border-green-500" : "border-red-500"}`}>
+                <div className={`w-1 h-1 rounded-full ${item.itemType === "veg" ? "bg-green-500" : "bg-red-500"}`} />
+              </div>
+            )}
             <h3 className="font-bold text-ink text-[14px] line-clamp-1 w-full">{item.name}</h3>
           </div>
           

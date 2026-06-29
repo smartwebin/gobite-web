@@ -170,9 +170,15 @@ export function ItemDetailModal({ item, isOpen, onClose, initialValues }: ItemDe
               <div>
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex items-start gap-3">
-                    <div className={`mt-1.5 w-4 h-4 border rounded-sm flex items-center justify-center bg-white shrink-0 ${item.itemType === "veg" ? "border-green-500" : "border-red-500"}`}>
-                      <div className={`w-2 h-2 rounded-full ${item.itemType === "veg" ? "bg-green-500" : "bg-red-500"}`} />
-                    </div>
+                    {item.itemType === "na" ? (
+                      <div className="mt-1.5 w-4 h-4 border rounded-sm flex items-center justify-center bg-white shrink-0 border-blue-500">
+                        <div className="w-2 h-2 rounded-full bg-blue-500" />
+                      </div>
+                    ) : (
+                      <div className={`mt-1.5 w-4 h-4 border rounded-sm flex items-center justify-center bg-white shrink-0 ${item.itemType === "veg" ? "border-green-500" : "border-red-500"}`}>
+                        <div className={`w-2 h-2 rounded-full ${item.itemType === "veg" ? "bg-green-500" : "bg-red-500"}`} />
+                      </div>
+                    )}
                     <h2 className="text-2xl font-extrabold text-ink leading-tight">{item.name}</h2>
                   </div>
                   <div className="text-right">

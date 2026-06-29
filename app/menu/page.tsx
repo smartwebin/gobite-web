@@ -26,7 +26,7 @@ function MenuContent() {
   const pickTable = searchParams.get("pick_table") === "1";
   const { tableNumber, setSessionInfo, menuItems, restaurantInfo, restaurantId, user, availableTables, isLoading } = useStore();
   const [activeCategory, setActiveCategory] = useState("All");
-  const [activeType, setActiveType] = useState<"all" | "veg" | "non-veg">("all");
+  const [activeType, setActiveType] = useState<"all" | "veg" | "non-veg" | "na">("all");
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [showTablePicker, setShowTablePicker] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -103,6 +103,7 @@ function MenuContent() {
           { label: "All", value: "all" },
           { label: "Veg", value: "veg" },
           { label: "Non-Veg", value: "non-veg" },
+          { label: "Not Applicable", value: "na" },
         ].map((t) => {
           const active = activeType === t.value;
           let activeColorClass = "border-primary bg-accentLight text-primary";
@@ -120,6 +121,13 @@ function MenuContent() {
             vegOrNonVegIndicator = (
               <div className="w-2.5 h-2.5 border border-red-500 flex items-center justify-center rounded-[1px] mr-1.5 shrink-0">
                 <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
+              </div>
+            );
+          } else if (t.value === "na") {
+            activeColorClass = "border-blue-500 bg-blue-50 text-blue-600";
+            vegOrNonVegIndicator = (
+              <div className="w-2.5 h-2.5 border border-blue-500 flex items-center justify-center rounded-[1px] mr-1.5 shrink-0">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
               </div>
             );
           }

@@ -15,7 +15,7 @@ export interface MenuItem {
   popular?: boolean;
   available?: boolean;
   offerPrice?: number;
-  itemType?: "veg" | "non-veg";
+  itemType?: "veg" | "non-veg" | "na";
   stockType?: "unlimited" | "limited";
   stockQuantity?: number;
   variants?: ItemVariant[];
