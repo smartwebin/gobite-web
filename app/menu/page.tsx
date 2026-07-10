@@ -38,7 +38,7 @@ function MenuContent() {
     return cats;
   }, [menuItems]);
 
-  const hotelName = restaurantInfo?.name || "GoBite";
+  const hotelName = restaurantInfo?.name || "ClickBite";
 
   // If arrived via QR scan or pick_table flag, ALWAYS force the table picker open
   useEffect(() => {

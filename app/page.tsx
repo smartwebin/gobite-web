@@ -225,7 +225,7 @@ function GetStartedContent() {
   const getTitle = () => {
     switch (view) {
       case "welcome":
-        return "Gobite";
+        return "ClickBite";
       case "login":
         return "Welcome Back";
       case "signup":
@@ -269,7 +269,7 @@ function GetStartedContent() {
                 <QrCode size={28} />
               </div>
               <span className="text-3xl font-black text-ink tracking-tight">
-                Gobite
+                ClickBite
               </span>
             </div>
           </motion.div>

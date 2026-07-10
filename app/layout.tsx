@@ -6,8 +6,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Gobite Web Ordering",
-  description: "Order seamlessly via the Gobite Web App",
+  title: "ClickBite Web Ordering",
+  description: "Order seamlessly via the ClickBite Web App",
 };
 
 export const viewport: Viewport = {

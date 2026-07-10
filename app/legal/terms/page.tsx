@@ -101,7 +101,7 @@ export default function TermsPage() {
 
           <div className="pt-6 border-t border-borderLite text-center">
             <span className="text-xs text-inkLight">
-              © {new Date().getFullYear()} Gobite. All rights reserved.
+              © {new Date().getFullYear()} ClickBite. All rights reserved.
             </span>
           </div>
         </section>

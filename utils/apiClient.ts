@@ -8,22 +8,22 @@ export const setAuthToken = (token: string | null) => {
   _authToken = token;
   if (typeof window !== 'undefined') {
     if (token) {
-      localStorage.setItem('gobite_jwt_token', token);
+      localStorage.setItem('clickbite_jwt_token', token);
     } else {
-      localStorage.removeItem('gobite_jwt_token');
+      localStorage.removeItem('clickbite_jwt_token');
     }
   }
 };
 
 export const getAuthToken = () => {
   if (typeof window !== 'undefined' && !_authToken) {
-    _authToken = localStorage.getItem('gobite_jwt_token');
+    _authToken = localStorage.getItem('clickbite_jwt_token');
   }
   return _authToken;
 };
 
 /**
- * Centralized API client for GoBite
+ * Centralized API client for ClickBite
  */
 export const apiClient = {
   async request(endpoint: string, options: RequestInit = {}) {

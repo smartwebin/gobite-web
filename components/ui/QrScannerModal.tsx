@@ -65,7 +65,7 @@ export function QrScannerModal({ isOpen, onClose }: Props) {
   const handleQrResult = useCallback(
     (text: string) => {
       const token = extractToken(text);
-      if (!token) return; // not a valid GoBite QR
+      if (!token) return; // not a valid ClickBite QR
       if (scanState === "found") return; // already handled
 
       setScanState("found");

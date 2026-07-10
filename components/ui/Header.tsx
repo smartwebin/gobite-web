@@ -60,7 +60,7 @@ export function Header({
                 </button>
                 <Image 
                   src="/logo.png" 
-                  alt={"Gobite"} 
+                  alt={"ClickBite"} 
                   width={66} 
                   height={66} 
                   className="object-contain"
@@ -163,8 +163,8 @@ export function Header({
                   </button>
                 </div>
                 <div className="flex flex-col items-center gap-2">
-                  <Image src="/logo.png" alt="Gobite" width={80} height={80} className="object-contain" />
-                  <span className="text-2xl font-black text-primary tracking-tighter uppercase">Gobite</span>
+                  <Image src="/logo.png" alt="ClickBite" width={80} height={80} className="object-contain" />
+                  <span className="text-2xl font-black text-primary tracking-tighter uppercase">ClickBite</span>
                 </div>
               </div>
 

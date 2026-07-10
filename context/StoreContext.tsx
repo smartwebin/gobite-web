@@ -75,12 +75,12 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 const STORAGE_KEYS = {
-  USER: "gobite_web_user",
-  CART: "gobite_web_cart",
-  ORDERS: "gobite_web_orders",
-  TABLE: "gobite_web_table",
-  MENU: "gobite_web_menu",
-  REST_ID: "gobite_web_rest_id",
+  USER: "clickbite_web_user",
+  CART: "clickbite_web_cart",
+  ORDERS: "clickbite_web_orders",
+  TABLE: "clickbite_web_table",
+  MENU: "clickbite_web_menu",
+  REST_ID: "clickbite_web_rest_id",
 };
 
 export const StoreProvider = ({ children }: { children?: ReactNode }) => {

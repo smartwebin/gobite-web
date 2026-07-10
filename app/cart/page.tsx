@@ -173,7 +173,7 @@ export default function CartPage() {
                     ? "Takeaway Order"
                     : `Table ${tableNumber?.split("-")[1] || tableNumber}`}
                 </p>
-                <p className="text-xs text-inkMid">{restaurantInfo?.name || "GoBite"}</p>
+                <p className="text-xs text-inkMid">{restaurantInfo?.name || "ClickBite"}</p>
               </div>
             </div>
             <button
@@ -239,7 +239,7 @@ export default function CartPage() {
             <ShieldCheck size={18} className="text-red-500 mt-0.5 shrink-0" />
             <p className="text-xs text-inkMid leading-relaxed">
               If you have food allergies, please inform{" "}
-              <strong className="text-ink">{restaurantInfo?.name || "GoBite"}</strong> before
+              <strong className="text-ink">{restaurantInfo?.name || "ClickBite"}</strong> before
               checkout.
             </p>
           </div>
