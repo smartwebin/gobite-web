@@ -82,39 +82,35 @@ export default function CartPage() {
         }
       }
 
-      const dineInItems = cart.filter(item => item.orderType === "Dining" || item.orderType === "dine-in" as any);
-      const takeawayItems = cart.filter(item => item.orderType === "Takeaway" || item.orderType === "takeaway" as any);
-      
+      const hasTable = tableId && tableId !== "0" && tableNumber !== "Takeaway";
+      const parentOrderType = hasTable ? "dine-in" : "takeaway";
       let placedOrderIds: string[] = [];
 
-      const placeOrderForType = async (items: CartItem[], type: "dine-in" | "takeaway") => {
-        if (items.length === 0) return;
+      if (cart.length > 0) {
         const orderData = {
           restaurant_id: parseInt(restaurantId),
           user_id: currentUserId,
-          table_id: type === "dine-in" && tableId && tableId !== "0" ? parseInt(tableId) : null,
-          order_type: type,
+          table_id: hasTable ? parseInt(tableId) : null,
+          order_type: parentOrderType,
           customer_email: email.trim() || undefined,
-          items: items.map(item => ({
+          items: cart.map(item => ({
             id: parseInt(item.id),
             quantity: item.quantity,
             instructions: item.instructions || "",
             variant_id: item.selectedVariant ? parseInt(item.selectedVariant.id) : null,
             allergies: item.allergies || [],
             customAllergy: item.customAllergy || "",
+            orderType: (item.orderType === "Dining" || item.orderType === "dine-in" as any) ? "dine-in" : "takeaway"
           }))
         };
         const resp = await apiClient.post("place-order.php", orderData);
         if (resp.status !== "success") {
-          throw new Error(resp.message || `Failed to place ${type} order.`);
+          throw new Error(resp.message || "Failed to place order.");
         }
         if (resp.data?.order_id) {
           placedOrderIds.push(resp.data.order_id.toString());
         }
-      };
-
-      if (dineInItems.length > 0) await placeOrderForType(dineInItems, "dine-in");
-      if (takeawayItems.length > 0) await placeOrderForType(takeawayItems, "takeaway");
+      }
 
       await fetchOrders();
       clearCart();

@@ -566,6 +566,15 @@ function GetStartedContent() {
               Privacy
             </button>
           </p>
+
+          <div className="pt-2 text-center pb-2">
+            <button
+              onClick={() => router.push("/partner")}
+              className="text-sm font-semibold text-inkMid hover:text-primary transition-colors flex items-center justify-center gap-1 mx-auto"
+            >
+              Partner with us <ArrowRight size={14} />
+            </button>
+          </div>
         </motion.div>
       </div>
     </div>
