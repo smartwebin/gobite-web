@@ -1,13 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Copy, Navigation, QrCode, Lock, Phone, User, Mail, ArrowRight } from "lucide-react";
+import { Copy, Navigation, QrCode, Lock, Phone, User, Mail, ArrowRight, Store, Clock, ShieldCheck, LogIn } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState, useEffect, Suspense } from "react";
 import { useStore } from "../context/StoreContext";
 import { apiClient, setAuthToken } from "../utils/apiClient";
+import Image from "next/image";
 
-type AuthView = "welcome" | "login" | "signup" | "signup_otp_verify";
+type AuthView = "landing" | "welcome" | "login" | "signup" | "signup_otp_verify";
 
 export default function GetStartedScreen() {
   return (
@@ -23,7 +24,7 @@ function GetStartedContent() {
 
   const router = useRouter();
   const { login, setSessionInfo, user, refreshData, isLoading } = useStore();
-  const [view, setView] = useState<AuthView>(token ? "welcome" : "login");
+  const [view, setView] = useState<AuthView>(token ? "welcome" : "landing");
   const [isValidToken, setIsValidToken] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -224,6 +225,8 @@ function GetStartedContent() {
 
   const getTitle = () => {
     switch (view) {
+      case "landing":
+        return "";
       case "welcome":
         return "ClickBite";
       case "login":
@@ -237,6 +240,8 @@ function GetStartedContent() {
 
   const getSubtitle = () => {
     switch (view) {
+      case "landing":
+        return "";
       case "welcome":
         return "Quickly order delicious food to your table.";
       case "login":
@@ -257,7 +262,7 @@ function GetStartedContent() {
       {/* Main Container */}
       <div className="relative z-10 flex-1 flex flex-col px-6 py-8 max-w-md mx-auto w-full">
         {/* Header section */}
-        {view !== "welcome" && (
+        {view !== "welcome" && view !== "landing" && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -282,7 +287,7 @@ function GetStartedContent() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4 }}
-          className="bg-white/80 backdrop-blur-md border border-white p-6 rounded-3xl shadow-xl space-y-5"
+          className={view === "landing" ? "flex-1 flex flex-col items-center justify-center space-y-8" : "bg-white/80 backdrop-blur-md border border-white p-6 rounded-3xl shadow-xl space-y-5"}
         >
           {view === "welcome" && (
              <div className="flex justify-center mt-2 mb-6">
@@ -294,12 +299,14 @@ function GetStartedContent() {
              </div>
           )}
 
-          <div className="text-center space-y-2">
-            <h1 className="text-2xl font-extrabold text-ink tracking-tight">
-              {getTitle()}
-            </h1>
-            <p className="text-sm text-inkMid font-medium px-2">{getSubtitle()}</p>
-          </div>
+          {view !== "landing" && (
+            <div className="text-center space-y-2">
+              <h1 className="text-2xl font-extrabold text-ink tracking-tight">
+                {getTitle()}
+              </h1>
+              <p className="text-sm text-inkMid font-medium px-2">{getSubtitle()}</p>
+            </div>
+          )}
 
           {error && (
             <div className={`${
@@ -310,6 +317,54 @@ function GetStartedContent() {
                 : "bg-red-50 text-red-600 border-red-100"
             } text-sm px-4 py-3 rounded-xl border flex items-center gap-2`}>
               <span>{error.replace("success:", "").replace("warning:", "")}</span>
+            </div>
+          )}
+
+          {/* ----- LANDING VIEW ----- */}
+          {view === "landing" && (
+            <div className="w-full flex flex-col items-center mt-8">
+              <div className="w-48 h-48 mb-8 relative">
+                <Image src="/logo.png" alt="ClickBite Logo" fill className="object-contain drop-shadow-md" priority />
+              </div>
+              
+              <div className="flex flex-row justify-center gap-3 mb-10 w-full px-2">
+                <div className="flex flex-row items-center gap-2 bg-white/90 px-3 py-2 rounded-xl shadow-sm border border-borderLite">
+                  <div className="w-6 h-6 bg-[#FFF0EA] text-primary rounded-lg flex items-center justify-center">
+                    <Store size={14} />
+                  </div>
+                  <span className="text-xs font-semibold text-inkMid">Live Menu</span>
+                </div>
+                <div className="flex flex-row items-center gap-2 bg-white/90 px-3 py-2 rounded-xl shadow-sm border border-borderLite">
+                  <div className="w-6 h-6 bg-[#FFF0EA] text-primary rounded-lg flex items-center justify-center">
+                    <Clock size={14} />
+                  </div>
+                  <span className="text-xs font-semibold text-inkMid">Track Orders</span>
+                </div>
+                <div className="flex flex-row items-center gap-2 bg-white/90 px-3 py-2 rounded-xl shadow-sm border border-borderLite">
+                  <div className="w-6 h-6 bg-[#FFF0EA] text-primary rounded-lg flex items-center justify-center">
+                    <ShieldCheck size={14} />
+                  </div>
+                  <span className="text-xs font-semibold text-inkMid">Allergy Safe</span>
+                </div>
+              </div>
+
+              <div className="w-full space-y-4">
+                <button
+                  onClick={() => alert("To place an order, simply scan the QR code on your table using your phone's camera!")}
+                  className="w-full bg-primary hover:bg-primaryHover text-white font-bold text-lg py-4 rounded-2xl shadow-[0_6px_20px_rgba(255,107,53,0.32)] transition-transform active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                  <QrCode size={22} />
+                  Scan QR & Order
+                </button>
+
+                <button
+                  onClick={() => setView("login")}
+                  className="w-full bg-white/70 hover:bg-white text-inkMid font-semibold text-sm py-3.5 rounded-full border border-borderLite transition-all flex items-center justify-center gap-2"
+                >
+                  <LogIn size={16} />
+                  Login
+                </button>
+              </div>
             </div>
           )}
 
@@ -570,7 +625,7 @@ function GetStartedContent() {
           <div className="pt-2 text-center pb-2">
             <button
               onClick={() => router.push("/partner")}
-              className="text-sm font-semibold text-inkMid hover:text-primary transition-colors flex items-center justify-center gap-1 mx-auto"
+              className={`text-sm font-semibold hover:text-primary transition-colors flex items-center justify-center gap-1 mx-auto ${view === 'landing' ? 'text-ink' : 'text-inkMid'}`}
             >
               Partner with us <ArrowRight size={14} />
             </button>
