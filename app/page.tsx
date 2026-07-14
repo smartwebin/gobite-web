@@ -350,7 +350,7 @@ function GetStartedContent() {
 
               <div className="w-full space-y-4">
                 <button
-                  onClick={() => alert("To place an order, simply scan the QR code on your table using your phone's camera!")}
+                  onClick={() => router.push('/qr-scan')}
                   className="w-full bg-primary hover:bg-primaryHover text-white font-bold text-lg py-4 rounded-2xl shadow-[0_6px_20px_rgba(255,107,53,0.32)] transition-transform active:scale-[0.98] flex items-center justify-center gap-2"
                 >
                   <QrCode size={22} />
