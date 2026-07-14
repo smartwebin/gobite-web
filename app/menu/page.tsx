@@ -48,9 +48,16 @@ function MenuContent() {
   }, [fromScan, pickTable]);
 
   useEffect(() => {
+    if (isLoading) return; // Wait until store is loaded from localStorage
+
+    // Protect menu page: redirect if no restaurant data is available
+    if (!restaurantId || restaurantId === "default") {
+      router.replace(user && !user.is_guest ? "/dashboard" : "/");
+      return;
+    }
+
     // Skip if fromScan or pickTable already triggered the picker
     if (fromScan || pickTable) return;
-    if (isLoading) return; // Wait until store is loaded from localStorage
     
     if (restaurantId && restaurantId !== "default" && !tableNumber && (!user || user.role === "customer")) {
       const myEngagedTable = availableTables.find((t: any) => t.engaged_by_user_id?.toString() === user?.id?.toString());
