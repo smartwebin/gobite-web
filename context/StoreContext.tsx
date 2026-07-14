@@ -199,6 +199,10 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
           const urlTable = searchParams.get("table");
 
           if (urlRestId) {
+            if (storedRestId && storedRestId !== urlRestId) {
+              setCart([]);
+              localStorage.removeItem(STORAGE_KEYS.CART);
+            }
             rid = urlRestId;
             setRestaurantId(rid);
             localStorage.setItem(STORAGE_KEYS.REST_ID, rid);
@@ -215,6 +219,10 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
               if (resp.status === "success" && resp.data) {
                 const d = resp.data;
                 rid = d.restaurant_id.toString();
+                if (storedRestId && storedRestId !== rid) {
+                  setCart([]);
+                  localStorage.removeItem(STORAGE_KEYS.CART);
+                }
                 setRestaurantId(rid);
                 setTableNumber(d.table_number?.toString() || "");
                 setTableId(d.table_id?.toString() || "0");
@@ -603,6 +611,13 @@ export const StoreProvider = ({ children }: { children?: ReactNode }) => {
       setRestaurantInfo(null);
       setMenuItems([]);
       setAvailableTables([]);
+    }
+
+    if (isNewRestaurant && restId !== "default") {
+      setCart([]);
+      if (typeof window !== "undefined") {
+        localStorage.removeItem(STORAGE_KEYS.CART);
+      }
     }
 
     if (typeof window !== "undefined") {
