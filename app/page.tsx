@@ -7,6 +7,7 @@ import React, { useState, useEffect, Suspense } from "react";
 import { useStore } from "../context/StoreContext";
 import { apiClient, setAuthToken } from "../utils/apiClient";
 import Image from "next/image";
+import { QrScannerModal } from "../components/ui/QrScannerModal";
 
 type AuthView = "landing" | "welcome" | "login" | "signup" | "signup_otp_verify";
 
@@ -25,6 +26,7 @@ function GetStartedContent() {
   const router = useRouter();
   const { login, setSessionInfo, user, refreshData, isLoading } = useStore();
   const [view, setView] = useState<AuthView>(token ? "welcome" : "landing");
+  const [isScanning, setIsScanning] = useState(false);
   const [isValidToken, setIsValidToken] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -350,7 +352,7 @@ function GetStartedContent() {
 
               <div className="w-full space-y-4">
                 <button
-                  onClick={() => router.push('/qr-scan')}
+                  onClick={() => setIsScanning(true)}
                   className="w-full bg-primary hover:bg-primaryHover text-white font-bold text-lg py-4 rounded-2xl shadow-[0_6px_20px_rgba(255,107,53,0.32)] transition-transform active:scale-[0.98] flex items-center justify-center gap-2"
                 >
                   <QrCode size={22} />
@@ -632,6 +634,7 @@ function GetStartedContent() {
           </div>
         </motion.div>
       </div>
+      <QrScannerModal isOpen={isScanning} onClose={() => setIsScanning(false)} />
     </div>
   );
 }
