@@ -132,17 +132,8 @@ export default function CartPage() {
             <ShoppingBag size={40} className="text-inkLight" />
           </div>
           <h2 className="text-2xl font-extrabold text-ink tracking-tight">
-            Your cart is empty
+            Empty Cart
           </h2>
-          <p className="text-inkMid text-sm mb-4">
-            Pick something delicious from the menu!
-          </p>
-          <button
-            onClick={() => router.back()}
-            className="bg-primary hover:bg-primaryHover text-white font-bold py-3.5 px-8 rounded-2xl shadow-lg transition-colors"
-          >
-            Browse Menu
-          </button>
         </div>
       </div>
     );

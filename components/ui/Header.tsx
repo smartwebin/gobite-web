@@ -170,6 +170,12 @@ export function Header({
 
               {/* Drawer Links */}
               <div className="flex-1 py-4 flex flex-col">
+                {user && (
+                  <button onClick={() => { closeDrawer(); router.push("/dashboard"); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-bgBase transition-colors text-left">
+                    <User size={22} className="text-inkMid" />
+                    <span className="text-base font-semibold text-ink">Dashboard</span>
+                  </button>
+                )}
                 <button onClick={() => { closeDrawer(); router.push("/legal/terms"); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-bgBase transition-colors text-left">
                   <FileText size={22} className="text-inkMid" />
                   <span className="text-base font-semibold text-ink">Terms & Conditions</span>
@@ -186,12 +192,6 @@ export function Header({
                   <LifeBuoy size={22} className="text-inkMid" />
                   <span className="text-base font-semibold text-ink">Support</span>
                 </button>
-                {user && (
-                  <button onClick={() => { closeDrawer(); router.push("/dashboard"); }} className="w-full flex items-center gap-4 px-6 py-4 hover:bg-bgBase transition-colors text-left">
-                    <User size={22} className="text-inkMid" />
-                    <span className="text-base font-semibold text-ink">Dashboard</span>
-                  </button>
-                )}
                 
                 {user && (
                   <div className="mt-auto border-t border-borderLite p-4">
