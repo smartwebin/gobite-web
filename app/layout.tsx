@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { StoreProvider } from "../context/StoreContext";
 import "./globals.css";
+import { CookieBanner } from "../components/ui/CookieBanner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -29,6 +30,7 @@ export default function RootLayout({
           {/* Responsive layout container */}
           <div className="mx-auto flex w-full min-h-screen flex-col bg-bgBase overflow-hidden relative">
             {children}
+            <CookieBanner />
           </div>
         </StoreProvider>
       </body>
