@@ -63,7 +63,6 @@ export function TablePickerModal({ isOpen, onClose }: TablePickerModalProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
           />
 
@@ -83,12 +82,6 @@ export function TablePickerModal({ isOpen, onClose }: TablePickerModalProps) {
                   Pick your table or choose Takeaway.
                 </p>
               </div>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
-              >
-                <X size={18} className="text-inkMid" />
-              </button>
             </div>
 
             {/* Body */}

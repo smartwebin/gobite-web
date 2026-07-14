@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Check, ListChecks } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState, useRef } from "react";
 import { useStore } from "../../context/StoreContext";
 import { apiClient } from "../../utils/apiClient";
 
@@ -11,9 +11,10 @@ import { apiClient } from "../../utils/apiClient";
 function OrderSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { orders } = useStore();
+  const { orders, setSessionInfo } = useStore();
   const [countdown, setCountdown] = useState(10);
   const [orderDetail, setOrderDetail] = useState<any>(null);
+  const keepSessionRef = useRef(false);
 
   const urlOrderIds = searchParams.get("order_ids") || searchParams.get("order_id");
   const idArray = urlOrderIds ? urlOrderIds.split(",") : [];
@@ -48,6 +49,20 @@ function OrderSuccessContent() {
     const timer = setInterval(() => setCountdown((c) => c - 1), 1000);
     return () => clearInterval(timer);
   }, [countdown, router]);
+
+  useEffect(() => {
+    // Cleanup: clear session unless they explicitly chose to order more
+    return () => {
+      if (!keepSessionRef.current) {
+        setSessionInfo("default", "", "0");
+      }
+    };
+  }, [setSessionInfo]);
+
+  const handleOrderMore = () => {
+    keepSessionRef.current = true;
+    router.push("/menu");
+  };
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center p-8 bg-bgBase min-h-screen text-center relative overflow-hidden">
@@ -115,7 +130,7 @@ function OrderSuccessContent() {
           </button>
 
           <button
-            onClick={() => router.push("/menu")}
+            onClick={handleOrderMore}
             className="w-full flex items-center justify-center gap-2 py-4 bg-primary text-white hover:bg-primaryHover transition-colors font-bold rounded-2xl shadow-lg"
           >
             Order More

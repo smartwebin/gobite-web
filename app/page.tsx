@@ -69,6 +69,7 @@ function GetStartedContent() {
           router.push("/menu?from_scan=1");
         } else {
           setError("success:Table identified! Please login or continue as guest.");
+          setView("welcome");
         }
       } else {
         setSessionInfo("default", "", "0");
