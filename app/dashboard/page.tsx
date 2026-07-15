@@ -10,7 +10,9 @@ import {
   ChevronRight,
   Utensils,
   ShoppingBag,
-  Trash2
+  Trash2,
+  X,
+  AlertTriangle
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -26,9 +28,9 @@ export default function DashboardPage() {
   const { user, logout, restaurantInfo, tableNumber, restaurantId, isLoading } = useStore();
   const [isScanning, setIsScanning] = React.useState(false);
   const [isDeleting, setIsDeleting] = React.useState(false);
+  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
 
-  const handleDeleteAccount = async () => {
-    if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) return;
+  const confirmDeleteAccount = async () => {
     setIsDeleting(true);
     try {
       const resp = await apiClient.post("update-customer.php", {
@@ -41,10 +43,12 @@ export default function DashboardPage() {
       } else {
         alert(resp.message || "Failed to delete account.");
         setIsDeleting(false);
+        setShowDeleteModal(false);
       }
     } catch (err: any) {
       alert(err.message || "Failed to delete account.");
       setIsDeleting(false);
+      setShowDeleteModal(false);
     }
   };
 
@@ -215,7 +219,7 @@ export default function DashboardPage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 + (NAV_ITEMS.length + 1) * 0.05 }}
-            onClick={handleDeleteAccount}
+            onClick={() => setShowDeleteModal(true)}
             disabled={isDeleting}
             className="bg-[#FEF2F2] p-5 rounded-2xl border border-red-200 shadow-sm hover:bg-red-100 transition-all flex items-center gap-4 text-left group active:scale-[0.98] disabled:opacity-50"
           >
@@ -232,6 +236,59 @@ export default function DashboardPage() {
       </main>
 
       <QrScannerModal isOpen={isScanning} onClose={() => setIsScanning(false)} />
+
+      {/* Custom Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => !isDeleting && setShowDeleteModal(false)}
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          />
+          
+          {/* Modal Content */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden"
+          >
+            <div className="p-6 text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle size={32} className="text-red-500" />
+              </div>
+              <h3 className="text-xl font-black text-ink mb-2">Delete Account?</h3>
+              <p className="text-sm text-inkMid mb-6">
+                This action is permanent and cannot be undone. All your personal data and order history will be removed.
+              </p>
+              
+              <div className="space-y-3">
+                <button
+                  onClick={confirmDeleteAccount}
+                  disabled={isDeleting}
+                  className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3.5 rounded-2xl transition-colors disabled:opacity-70 flex justify-center items-center"
+                >
+                  {isDeleting ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    "Yes, Delete My Account"
+                  )}
+                </button>
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={isDeleting}
+                  className="w-full bg-gray-100 hover:bg-gray-200 text-inkMid font-bold py-3.5 rounded-2xl transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
     </PrivateRoute>
   );
