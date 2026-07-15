@@ -9,7 +9,8 @@ import {
   MapPin, 
   ChevronRight,
   Utensils,
-  ShoppingBag
+  ShoppingBag,
+  Trash2
 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -18,11 +19,34 @@ import { Header } from "../../components/ui/Header";
 import { PrivateRoute } from "../../components/ui/PrivateRoute";
 import { QrScannerModal } from "../../components/ui/QrScannerModal";
 import { useStore } from "../../context/StoreContext";
+import { apiClient } from "../../utils/apiClient";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, logout, restaurantInfo, tableNumber, restaurantId, isLoading } = useStore();
   const [isScanning, setIsScanning] = React.useState(false);
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
+  const handleDeleteAccount = async () => {
+    if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) return;
+    setIsDeleting(true);
+    try {
+      const resp = await apiClient.post("update-customer.php", {
+        action: "delete_account",
+        user_id: user?.id,
+      });
+      if (resp.status === "success") {
+        logout();
+        router.replace("/");
+      } else {
+        alert(resp.message || "Failed to delete account.");
+        setIsDeleting(false);
+      }
+    } catch (err: any) {
+      alert(err.message || "Failed to delete account.");
+      setIsDeleting(false);
+    }
+  };
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -182,6 +206,25 @@ export default function DashboardPage() {
             <div className="flex-1">
               <h4 className="font-bold text-red-600">Logout</h4>
               <p className="text-xs text-red-400">Sign out and clear session</p>
+            </div>
+            <ChevronRight size={16} className="text-red-300" />
+          </motion.button>
+          
+          {/* Delete Account */}
+          <motion.button
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 + (NAV_ITEMS.length + 1) * 0.05 }}
+            onClick={handleDeleteAccount}
+            disabled={isDeleting}
+            className="bg-[#FEF2F2] p-5 rounded-2xl border border-red-200 shadow-sm hover:bg-red-100 transition-all flex items-center gap-4 text-left group active:scale-[0.98] disabled:opacity-50"
+          >
+            <div className="w-14 h-14 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+              <Trash2 size={24} />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-bold text-red-700">{isDeleting ? "Deleting..." : "Delete Account"}</h4>
+              <p className="text-xs text-red-500">Permanently wipe your data</p>
             </div>
             <ChevronRight size={16} className="text-red-300" />
           </motion.button>
