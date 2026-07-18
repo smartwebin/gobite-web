@@ -216,11 +216,6 @@ export function ItemDetailModal({ item, isOpen, onClose, initialValues }: ItemDe
                         >
                           {active && <Check size={13} />}
                           <span>{v.variantName}</span>
-                          {v.priceImpact !== 0 && (
-                            <span className={`text-xs ${active ? "text-primary" : "text-inkLight"}`}>
-                              {sign}£{Math.abs(v.priceImpact).toFixed(2)}
-                            </span>
-                          )}
                         </button>
                       );
                     })}
