@@ -379,7 +379,6 @@ export default function CartPage() {
                 quantity: editingItem.quantity,
                 orderType: editingItem.orderType,
                 instructions: editingItem.instructions,
-                selectedAllergies: editingItem.allergies,
                 customAllergy: editingItem.customAllergy,
                 selectedVariant: editingItem.selectedVariant,
                 cartId: editingItem.cartId,

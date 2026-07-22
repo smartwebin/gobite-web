@@ -5,10 +5,6 @@ import { Check, ChevronDown, ChevronUp, Minus, Plus, X } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useStore } from "../../context/StoreContext";
-const COMMON_ALLERGIES = [
-  "Peanuts", "Dairy", "Gluten", "Shellfish",
-  "Soy", "Eggs", "Tree Nuts", "Fish"
-];
 import { ItemVariant, MenuItem, OrderType } from "../../utils/types";
 
 interface ItemDetailModalProps {
@@ -27,35 +23,34 @@ interface ItemDetailModalProps {
 }
 
 export function ItemDetailModal({ item, isOpen, onClose, initialValues }: ItemDetailModalProps) {
-  const { cart, addToCart, updateQuantity: updateCartQuantity, updateCartItem, tableNumber } = useStore();
+  const { cart, addToCart, updateQuantity: updateCartQuantity, updateCartItem, tableNumber, restaurantInfo } = useStore();
   const [quantity, setQuantity]               = useState(1);
   const [orderType, setOrderType]             = useState<OrderType>("Dining");
   const [instructions, setInstructions]       = useState("");
-  const [selectedAllergies, setSelectedAllergies] = useState<string[]>([]);
   const [customAllergy, setCustomAllergy]     = useState("");
-  const [showAllergies, setShowAllergies]     = useState(false);
   const [existingCartId, setExistingCartId]   = useState<string | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<ItemVariant | null>(null);
 
   const isTakeawayOnly = tableNumber === "Takeaway";
+
+  const variants    = item?.variants ?? [];
+  const hasVariants = variants.length > 0;
 
   useEffect(() => {
     if (isOpen && item) {
       if (initialValues) {
         setOrderType(initialValues.orderType || (isTakeawayOnly ? "Takeaway" : "Dining"));
         setInstructions(initialValues.instructions || "");
-        setSelectedAllergies(initialValues.selectedAllergies || []);
         setCustomAllergy(initialValues.customAllergy || "");
         setQuantity(initialValues.quantity || 1);
-        setSelectedVariant(initialValues.selectedVariant || null);
+        setSelectedVariant(initialValues.selectedVariant || (hasVariants ? variants.reduce((min, v) => (v.offerPrice ?? v.price) < (min.offerPrice ?? min.price) ? v : min, variants[0]) : null));
         setExistingCartId(initialValues.cartId || null);
       } else {
         setOrderType(isTakeawayOnly ? "Takeaway" : "Dining");
         setInstructions("");
-        setSelectedAllergies([]);
         setCustomAllergy("");
         setQuantity(1);
-        setSelectedVariant(null);
+        setSelectedVariant(hasVariants ? variants.reduce((min, v) => (v.offerPrice ?? v.price) < (min.offerPrice ?? min.price) ? v : min, variants[0]) : null);
         setExistingCartId(null);
       }
     }
@@ -65,7 +60,7 @@ export function ItemDetailModal({ item, isOpen, onClose, initialValues }: ItemDe
   useEffect(() => {
     if (!item || !isOpen || (initialValues && initialValues.cartId)) return;
     
-    const targetId = `${item.id}-${selectedVariant?.id ?? ""}-${orderType}-${instructions.trim()}-${[...selectedAllergies].sort().join(",")}-${customAllergy.trim()}`;
+    const targetId = `${item.id}-${selectedVariant?.id ?? ""}-${orderType}-${instructions.trim()}--${customAllergy.trim()}`;
     const found = cart.find((i) => i.cartId === targetId);
     if (found) {
       setExistingCartId(found.cartId);
@@ -74,10 +69,7 @@ export function ItemDetailModal({ item, isOpen, onClose, initialValues }: ItemDe
       setExistingCartId(null);
       if (quantity === 0) setQuantity(1);
     }
-  }, [item, isOpen, orderType, instructions, selectedAllergies, customAllergy, selectedVariant, cart, initialValues]);
-
-  const variants    = item?.variants ?? [];
-  const hasVariants = variants.length > 0;
+  }, [item, isOpen, orderType, instructions, customAllergy, selectedVariant, cart, initialValues]);
 
   useEffect(() => {
     if (isOpen && item) {
@@ -91,18 +83,22 @@ export function ItemDetailModal({ item, isOpen, onClose, initialValues }: ItemDe
   if (!item) return null;
 
   const basePrice      = item.offerPrice ?? item.price;
-  const variantDelta   = selectedVariant?.priceImpact ?? 0;
-  const effectivePrice = basePrice + variantDelta;
+  const effectivePrice = hasVariants && selectedVariant ? (selectedVariant.offerPrice ?? selectedVariant.price) : basePrice;
   const totalPrice     = (effectivePrice * quantity).toFixed(2);
 
   const handleAddToCart = () => {
+    if (hasVariants && !selectedVariant) {
+      alert("Please select a variant.");
+      return;
+    }
+
     try {
       const params = {
         item: { ...item, price: effectivePrice },
         quantity,
         orderType,
         instructions: instructions.trim(),
-        allergies: selectedAllergies,
+        allergies: [],
         customAllergy: customAllergy.trim(),
         selectedVariant: selectedVariant ?? undefined,
       };
@@ -183,9 +179,11 @@ export function ItemDetailModal({ item, isOpen, onClose, initialValues }: ItemDe
                   </div>
                   <div className="text-right">
                     <span className="text-xl font-black text-primary">£{totalPrice}</span>
-                    {variantDelta !== 0 && (
-                      <p className="text-xs text-gray-400 line-through">£{(basePrice * quantity).toFixed(2)}</p>
-                    )}
+                    {(hasVariants && selectedVariant && selectedVariant.offerPrice && selectedVariant.offerPrice < selectedVariant.price) ? (
+                      <p className="text-xs text-gray-400 line-through">£{(selectedVariant.price * quantity).toFixed(2)}</p>
+                    ) : (!hasVariants && item.offerPrice && item.offerPrice < item.price) ? (
+                      <p className="text-xs text-gray-400 line-through">£{(item.price * quantity).toFixed(2)}</p>
+                    ) : null}
                   </div>
                 </div>
                 <p className="text-inkMid text-sm leading-relaxed">{item.description}</p>
@@ -203,7 +201,7 @@ export function ItemDetailModal({ item, isOpen, onClose, initialValues }: ItemDe
                   <div className="flex flex-wrap gap-2">
                     {variants.map((v) => {
                       const active = selectedVariant?.id === v.id;
-                      const sign   = v.priceImpact > 0 ? "+" : "";
+                      const vPrice = v.offerPrice ?? v.price;
                       return (
                         <button
                           key={v.id}
@@ -215,7 +213,7 @@ export function ItemDetailModal({ item, isOpen, onClose, initialValues }: ItemDe
                           }`}
                         >
                           {active && <Check size={13} />}
-                          <span>{v.variantName}</span>
+                          <span>{v.variantName} (£{vPrice.toFixed(2)})</span>
                         </button>
                       );
                     })}
@@ -264,66 +262,20 @@ export function ItemDetailModal({ item, isOpen, onClose, initialValues }: ItemDe
                 </div>
               </div>
 
-              {/* Allergies Toggle */}
-              <div className="space-y-3 border border-red-100 bg-red-50/50 rounded-2xl overflow-hidden transition-all">
-                <button
-                  onClick={() => setShowAllergies(!showAllergies)}
-                  className="w-full flex items-center justify-between p-4"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-red-500 font-bold">Allergies &amp; Dietary</span>
-                    {(selectedAllergies.length > 0 || customAllergy) && (
-                      <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">
-                        {selectedAllergies.length + (customAllergy ? 1 : 0)}
-                      </span>
-                    )}
-                  </div>
-                  {showAllergies ? <ChevronUp size={18} className="text-inkLight" /> : <ChevronDown size={18} className="text-inkLight" />}
-                </button>
-
-                <AnimatePresence>
-                  {showAllergies && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="px-4 pb-4 space-y-4"
-                    >
-                      <div className="flex flex-wrap gap-2">
-                        {COMMON_ALLERGIES.map((allergy) => {
-                          const isSelected = selectedAllergies.includes(allergy);
-                          return (
-                            <button
-                              key={allergy}
-                              onClick={() =>
-                                setSelectedAllergies(
-                                  isSelected
-                                    ? selectedAllergies.filter((a) => a !== allergy)
-                                    : [...selectedAllergies, allergy],
-                                )
-                              }
-                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all ${
-                                isSelected
-                                  ? "bg-red-500 border-red-500 text-white"
-                                  : "bg-white border-red-200 text-red-700 hover:bg-red-50"
-                              }`}
-                            >
-                              {isSelected && <Check size={12} />}
-                              {allergy}
-                            </button>
-                          );
-                        })}
-                      </div>
-                      <input
-                        type="text"
-                        value={customAllergy}
-                        onChange={(e) => setCustomAllergy(e.target.value)}
-                        placeholder="Other allergies?"
-                        className="w-full bg-white border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-400 placeholder:text-red-300"
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+              {/* Allergies Text Box */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-red-500 font-bold">Allergies &amp; Dietary</span>
+                </div>
+                <p className="text-xs text-red-500 font-semibold italic">
+                  If you have food allergies, please inform {restaurantInfo?.name || 'Albaik Restaurant'}.
+                </p>
+                <textarea
+                  value={customAllergy}
+                  onChange={(e) => setCustomAllergy(e.target.value)}
+                  placeholder="Type your allergies here..."
+                  className="w-full bg-red-50/50 border border-red-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-400 placeholder:text-red-300 min-h-[80px] resize-none"
+                />
               </div>
 
               {/* Special Instructions */}

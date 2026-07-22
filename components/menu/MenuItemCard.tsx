@@ -11,6 +11,10 @@ export function MenuItemCard({
   onClick: () => void;
 }) {
   const isAvailable = item.available !== false;
+  const hasVariants = item.variants && item.variants.length > 0;
+  const lowestVariantPrice = hasVariants 
+    ? Math.min(...item.variants!.map(v => v.offerPrice ?? v.price)) 
+    : 0;
   console.log(`[MenuItemCard] Image for ${item.name}:`, item.image);
 
   return (
@@ -76,13 +80,21 @@ export function MenuItemCard({
           </div>
           
           <div className="flex items-center gap-1.5 min-h-[20px]">
-            <span className="text-primary font-extrabold text-[14px]">
-              £{(item.offerPrice ?? item.price).toFixed(2)}
-            </span>
-            {item.offerPrice && (
-              <span className="text-[11px] text-inkLight line-through mt-[1px]">
-                £{item.price.toFixed(2)}
+            {hasVariants ? (
+              <span className="text-primary font-extrabold text-[14px]">
+                From £{lowestVariantPrice.toFixed(2)}
               </span>
+            ) : (
+              <>
+                <span className="text-primary font-extrabold text-[14px]">
+                  £{(item.offerPrice ?? item.price).toFixed(2)}
+                </span>
+                {item.offerPrice && (
+                  <span className="text-[11px] text-inkLight line-through mt-[1px]">
+                    £{item.price.toFixed(2)}
+                  </span>
+                )}
+              </>
             )}
           </div>
         </div>

@@ -1,7 +1,9 @@
 export interface ItemVariant {
   id: string;
   variantName: string;
-  priceImpact: number;
+  price: number;
+  basePrice?: number;
+  offerPrice?: number;
 }
 
 export interface MenuItem {
