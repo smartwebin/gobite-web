@@ -183,6 +183,15 @@ export default function OrdersPage() {
                                   </span>
                                 )}
 
+                                {!!(item.allergies?.length || item.customAllergy) && (
+                                  <div className="flex items-center gap-1 mt-1.5 text-red-500">
+                                    <AlertTriangle size={11} />
+                                    <span className="text-[11px] font-semibold">
+                                      Allergy: {[...(item.allergies || []), item.customAllergy].filter(Boolean).join(", ")}
+                                    </span>
+                                  </div>
+                                )}
+
                                 {isRemoved && (
                                   <div className="flex items-center gap-2 mt-1">
                                     <span className="text-[10px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded">
